@@ -2,7 +2,6 @@
 
 extern crate rand;
 
-/// This is a key value storage mechanism where values are stored and retrieved using keys which are of the i64 data type
 mod load {
 
     //! Load i32
@@ -31,9 +30,9 @@ mod load {
 mod store {
     use rand::Rng;
 
-    /// Create Random i64 Integer (which is positive i.e. non-negative)
-    /// Generates random i64 number and then converts it to an absolute value
-    /// Asserts that the value being returned is indeed absoulte i.e. is_positive
+    //! Create Random i64 Integer (which is positive i.e. non-negative)
+    //! Generates random i64 number and then converts it to an absolute value
+    //! Asserts that the value being returned is indeed absoulte i.e. is_positive
     fn create_random_i64() -> i64 {
         let mut rng = rand::thread_rng();
         let my_rand: i64 = rng.gen::<i64>().abs();
