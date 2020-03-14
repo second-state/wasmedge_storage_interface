@@ -55,9 +55,11 @@ mod load {
     }
 
     pub fn load_string(_key: i64) -> String {
-        // The test i32 is currently 7170388 which is equivalent to the String "Tim"
-        // First we convert the i32 to little endian bytes
-        let value_as_le_bytes = 7170388i32.to_le_bytes();
+        // The first thing we do is call SSVM database using the key and this will return (a list of i32s)
+        // Just for now though, the test i32 is currently 7170388 which is equivalent to the String "Tim". Obviouisly longer strings will be stored in many i32s
+        let _call_database_using_key: i32 = 7170388;
+        // We need to convert each i32 to little endian bytes like this
+        let value_as_le_bytes = _call_database_using_key.to_le_bytes();
         // TODO use the i32 that we fetched instead of this concrete value 7170388 above
         println!(
             "The i32 integer as little endian bytes: {:?}",
