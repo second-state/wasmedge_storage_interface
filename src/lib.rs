@@ -48,9 +48,10 @@ mod store {
     ///
     /// ```
     pub fn store_single_i32(_value: i32) -> i64 {
+        let new_key: i64 = create_random_i64();
         // TODO - will require the syntax to interact with SecondState's other native library for SSVM which provides the database interaction
         // placeholder for now is just returning a key via create_random_i64
-        create_random_i64()
+        new_key
     }
 
     /// Store i64
@@ -62,9 +63,10 @@ mod store {
     ///
     /// ```
     pub fn store_single_i64(_value: i64) -> i64 {
+        let new_key: i64 = create_random_i64();
         // TODO - will require the syntax to interact with SecondState's other native library for SSVM which provides the database interaction
         // placeholder for now is just returning a key via create_random_i64
-        create_random_i64()
+        new_key
     }
 }
 
