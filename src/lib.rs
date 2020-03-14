@@ -53,6 +53,34 @@ mod load {
         // placeholder for now is 1
         1
     }
+
+    pub fn load_string(_key: i64) -> String {
+        // The test i32 is currently 7170388 which is equivalent to the String "Tim"
+        // First we convert the i32 to little endian bytes
+        let value_as_le_bytes = 7170388i32.to_le_bytes();
+        // TODO use the i32 that we fetched instead of this concrete value 7170388 above
+        println!(
+            "The i32 integer as little endian bytes: {:?}",
+            value_as_le_bytes
+        );
+        // Output
+        // The i32 integer as little endian bytes: [84, 105, 109, 0]
+
+        // We now get the bytes into a vector and clean out the zeros that we may have used to fill the batch
+        let mut vec_for_string = value_as_le_bytes.to_vec();
+        while vec_for_string.get(vec_for_string.len() - 1) == Some(&0) {
+            println!("Found a zero at position: {:?}", vec_for_string.len() - 1);
+            vec_for_string.remove(vec_for_string.len() - 1);
+        }
+        // Output
+        // Found a zero at position: 3
+
+        // Lastly we pass the vec into the String::from_utf8
+        let re_string = String::from_utf8(vec_for_string).unwrap();
+        println!("String of bytes as string again: {:?}", re_string);
+        // Output
+        // String of bytes as string again: "Tim"
+    }
 }
 
 mod store {
@@ -97,6 +125,47 @@ mod store {
         // TODO - will require the syntax to interact with SecondState's other native library for SSVM which provides the database interaction
         // placeholder for now is just returning a key via create_random_i64
         new_key
+    }
+
+    // Just FYI, this will store Strings which consist of many i32 integers, not just "Tim". The user will still only get a single key and use that (internally we will have sequential suffix abstraction)
+    pub fn store_string(_value: &str) -> i64 {
+        // Take an example string
+        let raw_string = String::from(_value);
+
+        // Convert it into a byte array
+        let string_as_bytes = raw_string.as_bytes();
+        println!("String as bytes: {:?}", string_as_bytes);
+        // Output
+        // String as bytes: [84, 105, 109]
+
+        // See how long the entire array is
+        let string_as_bytes_length = raw_string.as_bytes().len();
+        println!(
+            "We have {:?} individual bytes to process ...",
+            string_as_bytes_length
+        );
+        // Output
+        // We have 3 individual bytes to process ...
+
+        // Need to split this example string into batches of 4 bytes
+        // Why? Because 8 of these 4 byte batches will make 32 bits which will fill a single i32
+
+        // If the number of individual bytes is not exactly divisible by 4 then ...
+        // We add as many zeros as required (topping up the byte array to be exactly 4 individual 8 bit parts) to the end of the byte array
+        // [84, 105, 109, 0]
+
+        // Need to generate a new i64 key for each batch (i.e. 1234001, 1234002, 1234003, 1234004)
+        // We can tweak our existing create_random_i64() function, from line 90 above, to achieve this easily
+
+        // We now convert the batch of 4 bytes to a full i32 integer
+        let string_as_i32 = i32::from_le_bytes([84, 105, 109, 0]); // Obviously we get this from a variable (after topping up code exists) and not concrete values as shown here
+        println!("String of bytes as i32: {:?}", string_as_i32);
+        // Output
+        // String of bytes as i32: 7170388
+
+        // We now call the store_single_i32 as many times as necessary and then return the i64 key
+        // We may need to create an additional store_single_i32 function which allows us to pass in the key
+        // This way, we can mint the base key, also append the suffix each time but only send back the base key (knowing that we can handle the iteration here)
     }
 }
 
