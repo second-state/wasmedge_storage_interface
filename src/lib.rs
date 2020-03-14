@@ -1,7 +1,37 @@
 //! Documentation for rust_storage_interface_library
+//!
+//! Load i32
+//! # Examples
+//! ```
+//! let my_previously_stored_i32_value: i32 = rust_storage_interface_library::load::loadi32(my_previously_saved_key: i64)
+//! ```
+//!
+//! Load i64
+//! # Examples
+//! ```
+//! let my_previously_stored_i64_value: i64 = rust_storage_interface_library::load::loadi64(my_previously_saved_key)
+//! ```
+//!
+//! Store i32
+//! Stores a single i32 value and returns a key which can be used to fetch the stored i32 value at a later date
+//! # Examples
+//! ```
+//! my_i32_to_store: i32 = 88;
+//! my_new_key: i64 = rust_storage_interface_library::store::storei32(my_i32_to_store)
+//!
+//! ```
+//!
+//! Store i64
+//! Stores a single i64 value and returns a key which can be used to fetch the stored i64 value at a later date
+//! # Examples
+//! ```
+//! my_i64_to_store: i64 = 88;
+//! my_new_key: i64 = rust_storage_interface_library::store::storei64(my_i64_to_store)
+//!
+//! ```
 
 mod load {
-    //! Documentation for load module
+    // Documentation for load module
     /// Load i32
     /// # Examples
     /// ```
