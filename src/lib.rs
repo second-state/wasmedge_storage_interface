@@ -1,9 +1,7 @@
 //! Documentation for rust_storage_interface_library
 
-extern crate rand;
-
 mod load {
-
+    //! Documentation for load module
     /// Load i32
     /// # Examples
     /// ```
@@ -28,6 +26,7 @@ mod load {
 }
 
 mod store {
+    extern crate rand;
     use rand::Rng;
 
     /// Create Random i64 Integer (which is positive i.e. non-negative)
