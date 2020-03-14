@@ -80,6 +80,7 @@ mod load {
         println!("String of bytes as string again: {:?}", re_string);
         // Output
         // String of bytes as string again: "Tim"
+        String::from("Tim") // Placeholder
     }
 }
 
@@ -166,6 +167,7 @@ mod store {
         // We now call the store_single_i32 as many times as necessary and then return the i64 key
         // We may need to create an additional store_single_i32 function which allows us to pass in the key
         // This way, we can mint the base key, also append the suffix each time but only send back the base key (knowing that we can handle the iteration here)
+        1 // Placeholder return type
     }
 }
 
