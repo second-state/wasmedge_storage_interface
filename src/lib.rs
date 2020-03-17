@@ -57,6 +57,7 @@ mod load {
     pub fn load_string(_key: i64) -> String {
         // The first thing we do is call SSVM database using the key and this will return (a list of i32s)
         // Just for now though, the test i32 is currently 7170388 which is equivalent to the String "Tim". Obviouisly longer strings will be stored in many i32s
+        // For strings which are stored across many i32s we will be calling the database many times using the master key using its sequential suffix
         let _call_database_using_key: i32 = 7170388;
         // We need to convert each i32 to little endian bytes like this
         let value_as_le_bytes = _call_database_using_key.to_le_bytes();
@@ -87,17 +88,35 @@ mod load {
 }
 
 mod store {
+    use std::time::SystemTime;
     extern crate rand;
     use rand::Rng;
 
-    /// Create Random i64 Integer (which is positive i.e. non-negative)
-    /// Generates random i64 number and then converts it to an absolute value
-    /// Asserts that the value being returned is indeed absoulte i.e. is_positive
-    fn create_random_i64() -> i64 {
+    /// Get the system time in seconds (epoch) which produces a 10 digit number
+    fn get_time() -> Result<u64, String> {
+        match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
+            Ok(n) => {println!("Generated 10 digit time epoch: {:?}", n.as_secs());
+            Ok(n.as_secs())},
+            Err(_) => Err("Unable to get system time".to_string()),
+        }
+    }
+
+    /// Get a random number which is 9 digits long
+    fn get_random_number() -> Result<i64, rand::Error> {
         let mut rng = rand::thread_rng();
-        let my_rand: i64 = rng.gen::<i64>().abs();
-        assert!(my_rand.is_positive());
-        my_rand
+        let my_rand: i64 = rng.gen_range(1, 1000000000);
+        println!("Generated 9 digit random number: {:?}", my_rand);
+        Ok(my_rand)
+    }
+
+    /// Join the time and random numbers from above to form a unique 19 digit key (to completely fill an i64 variable)
+    /// Also make sure that the number is absolute (not negative) and does not exceed the max value of i64 (which is 9223372036854775807)
+     fn create_unique_key() -> Result<i64, String> {
+        let a = format!("{:?}{:?}", get_time().unwrap(), get_random_number().unwrap());
+        let my_int: i64 = a.parse().unwrap();
+        assert!(my_int.is_positive());
+        assert!(my_int <= i64::max_value());
+        Ok(my_int)
     }
 
     /// Store i32
@@ -109,7 +128,7 @@ mod store {
     ///
     /// ```
     pub fn store_single_i32(_value: i32) -> i64 {
-        let new_key: i64 = create_random_i64();
+        let new_key: i64 = create_unique_key().unwrap();
         // TODO - will require the syntax to interact with SecondState's other native library for SSVM which provides the database interaction
         // placeholder for now is just returning a key via create_random_i64
         new_key
@@ -124,7 +143,7 @@ mod store {
     ///
     /// ```
     pub fn store_single_i64(_value: i64) -> i64 {
-        let new_key: i64 = create_random_i64();
+        let new_key: i64 = create_unique_key().unwrap();
         // TODO - will require the syntax to interact with SecondState's other native library for SSVM which provides the database interaction
         // placeholder for now is just returning a key via create_random_i64
         new_key
@@ -132,6 +151,7 @@ mod store {
 
     // Just FYI, this will store Strings which consist of many i32 integers, not just "Tim". The user will still only get a single key and use that (internally we will have sequential suffix abstraction)
     pub fn store_string(_value: &str) -> i64 {
+        let new_key: i64 = create_unique_key().unwrap();
         // Take an example string
         let raw_string = String::from(_value);
 
