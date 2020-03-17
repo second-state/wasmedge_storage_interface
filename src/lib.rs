@@ -154,42 +154,27 @@ mod store {
         let new_key: i64 = create_unique_key().unwrap();
         // Take an example string
         let raw_string = String::from(_value);
+        // Start the storage transaction
+        println!("Starting the storage transaction");
+        // TODO SSVM::beginStoreTx()
 
-        // Convert it into a byte array
-        let string_as_bytes = raw_string.as_bytes();
-        println!("String as bytes: {:?}", string_as_bytes);
-        // Output
-        // String as bytes: [84, 105, 109]
+        // Find the length of the raw string in terms of unicode scalar values
+        //let raw_string_length: i32 = raw_string.chars().count();
+        // Ensure that the number that represents the length of the string is going to fit inside a i32 variable
+        //assert!(raw_string_length <= i32::max_value());
+        // Also make sure that the number that represents the length of the string has not overflowed i.e. is greater than 2147483647
+        
+        // Place the length of the raw string into the first slot of the sequence
+        //println!("Adding the length ( {:?} ) of the raw string to the first slot.", raw_string_length);
+        // TODO SSVM::storei32(char as i32);
 
-        // See how long the entire array is
-        let string_as_bytes_length = raw_string.as_bytes().len();
-        println!(
-            "We have {:?} individual bytes to process ...",
-            string_as_bytes_length
-        );
-        // Output
-        // We have 3 individual bytes to process ...
-
-        // Need to split this example string into batches of 4 bytes
-        // Why? Because 8 of these 4 byte batches will make 32 bits which will fill a single i32
-
-        // If the number of individual bytes is not exactly divisible by 4 then ...
-        // We add as many zeros as required (topping up the byte array to be exactly 4 individual 8 bit parts) to the end of the byte array
-        // [84, 105, 109, 0]
-
-        // Need to generate a new i64 key for each batch (i.e. 1234001, 1234002, 1234003, 1234004)
-        // We can tweak our existing create_random_i64() function, from line 90 above, to achieve this easily
-
-        // We now convert the batch of 4 bytes to a full i32 integer
-        let string_as_i32 = i32::from_le_bytes([84, 105, 109, 0]); // Obviously we get this from a variable (after topping up code exists) and not concrete values as shown here
-        println!("String of bytes as i32: {:?}", string_as_i32);
-        // Output
-        // String of bytes as i32: 7170388
-
-        // We now call the store_single_i32 as many times as necessary and then return the i64 key
-        // We may need to create an additional store_single_i32 function which allows us to pass in the key
-        // This way, we can mint the base key, also append the suffix each time but only send back the base key (knowing that we can handle the iteration here)
-        1 // Placeholder return type
+        // Storing each of the unicode scalar values to slots
+        for single_char in raw_string.chars() {
+            println!("Adding {:?}", single_char);
+            // TODO SSVM:: storei32(char as i32);
+        }
+        // Return the new unique key to the calling code
+        new_key
     }
 }
 
