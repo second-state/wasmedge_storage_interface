@@ -180,7 +180,7 @@ mod store {
         // TODO SSVM::beginStoreTx()
 
         // Find the length of the raw string in terms of unicode scalar values
-        let raw_string_length: i32 = raw_string.chars().count();
+        let raw_string_length: i32 = raw_string.chars().count().try_into().unwrap();
         // Ensure that the number that represents the length of the string is going to fit inside a i32 variable
         //assert!(raw_string_length <= i32::max_value());
         // Also make sure that the number that represents the length of the string has not overflowed i.e. is greater than 2147483647
