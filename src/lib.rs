@@ -88,12 +88,14 @@ mod load {
 }
 
 mod store {
-    use std::time::SystemTime;
-    extern crate rand;
+    
     use rand::Rng;
+    extern crate rand;
+    use std::time::SystemTime;
+    use std::convert::TryInto;
 
     /// Get the system time in seconds (epoch) which produces a 10 digit number
-    fn get_time() -> Result<u64, String> {
+    pub fn get_time() -> Result<u64, String> {
         match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
             Ok(n) => {println!("Generated 10 digit time epoch: {:?}", n.as_secs());
             Ok(n.as_secs())},
@@ -101,18 +103,22 @@ mod store {
         }
     }
 
-    /// Get a random number which is 9 digits long
-    fn get_random_number() -> Result<i64, rand::Error> {
+    // Creates an absolute (non negative) random number which is a fixed length. Specifically, one character less than the length of the upper bound
+    pub fn create_fixed_length_random_number(_lower_bound: i64, _upper_bound: i64) -> Result<i64, rand::Error> {
+        let length: u64 = (_upper_bound.to_string().len() - 1).try_into().unwrap();
         let mut rng = rand::thread_rng();
-        let my_rand: i64 = rng.gen_range(1, 1000000000);
-        println!("Generated 9 digit random number: {:?}", my_rand);
+        let mut my_rand: i64 = rng.gen_range(_lower_bound, _upper_bound).abs();
+        while my_rand.to_string().len() < length.try_into().unwrap() {
+            my_rand = my_rand + rng.gen_range(_lower_bound, _upper_bound - my_rand);
+        }
+        println!("Generated {:?} digit random number between {:?} and {:?}: {:?}", (_upper_bound.to_string().len() - 1), _lower_bound, _upper_bound - 1 , my_rand);
         Ok(my_rand)
     }
 
     /// Join the time and random numbers from above to form a unique 19 digit key (to completely fill an i64 variable)
     /// Also make sure that the number is absolute (not negative) and does not exceed the max value of i64 (which is 9223372036854775807)
-     fn create_unique_key() -> Result<i64, String> {
-        let a = format!("{:?}{:?}", get_time().unwrap(), get_random_number().unwrap());
+    pub fn create_unique_key() -> Result<i64, String> {
+        let a = format!("{:?}{:?}", get_time().unwrap(), create_fixed_length_random_number(1, 1000000000).unwrap());
         let my_int: i64 = a.parse().unwrap();
         assert!(my_int.is_positive());
         assert!(my_int <= i64::max_value());
@@ -178,42 +184,33 @@ mod store {
     }
 }
 
-// Background information
-
-// WebAssembly - reference https://developer.mozilla.org/en-US/docs/WebAssembly/Understanding_the_text_format
-
-// Native WebAssembly Types
-// i32
-// i64
-// f32
-// f64
-
-// Rust - reference https://doc.rust-lang.org/book/ch03-02-data-types.html#scalar-types
-
-// Native Rust Integer Types (signed)
-// i8
-// i16
-// i32 - Primitive Type i32 reference https://doc.rust-lang.org/std/primitive.i32.html
-// i64 - Primitive Type i64 reference https://doc.rust-lang.org/std/primitive.i64.html
-// i128
-
-// Native Rust Integer Types (unsigned)
-// u8
-// u16
-// u32
-// u64
-// u128
-
-// High-level Rust Types which we are planning on catering for
-// Array
-// String
-// Struct
-
 // Test
 #[cfg(test)]
 mod tests {
+    use super::store;
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn test_get_time_is_ten_digits() {
+        let num1: u64 = store::get_time().unwrap();
+        assert_eq!(10, num1.to_string().len());
+    }
+    #[test]
+    fn test_create_fixed_length_random_number_is_nine_digits() {
+        let num2: i64 = store::create_fixed_length_random_number(1, 1000000000).unwrap();
+        assert_eq!(9, num2.to_string().len());
+    }
+    #[test]
+    fn test_create_fixed_length_random_number_is_gt_0() {
+        let num3: i64 = store::create_fixed_length_random_number(-100, 1).unwrap();
+        assert!(num3 > 0);
+    }
+    #[test]
+    fn test_create_fixed_length_random_number_is_lt_1000000000() {
+        let num4: i64 = store::create_fixed_length_random_number(1, 1000000000).unwrap();
+        assert!(num4 < 999999999);
+    }
+    #[test]
+    fn test_create_unique_key_in_nineteen_digits() {
+        let num5: i64 = store::create_unique_key().unwrap();
+        assert_eq!(19, num5.to_string().len());
     }
 }
