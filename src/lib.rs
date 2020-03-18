@@ -88,37 +88,52 @@ mod load {
 }
 
 mod store {
-    
+
     use rand::Rng;
     extern crate rand;
-    use std::time::SystemTime;
     use std::convert::TryInto;
+    use std::time::SystemTime;
 
     /// Get the system time in seconds (epoch) which produces a 10 digit number
     pub fn get_time() -> Result<u64, String> {
         match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
-            Ok(n) => {println!("Generated 10 digit time epoch: {:?}", n.as_secs());
-            Ok(n.as_secs())},
+            Ok(n) => {
+                println!("Generated 10 digit time epoch: {:?}", n.as_secs());
+                Ok(n.as_secs())
+            }
             Err(_) => Err("Unable to get system time".to_string()),
         }
     }
 
     // Creates an absolute (non negative) random number which is a fixed length. Specifically, one character less than the length of the upper bound
-    pub fn create_fixed_length_random_number(_lower_bound: i64, _upper_bound: i64) -> Result<i64, rand::Error> {
+    pub fn create_fixed_length_random_number(
+        _lower_bound: i64,
+        _upper_bound: i64,
+    ) -> Result<i64, rand::Error> {
         let length: u64 = (_upper_bound.to_string().len() - 1).try_into().unwrap();
         let mut rng = rand::thread_rng();
         let mut my_rand: i64 = rng.gen_range(_lower_bound, _upper_bound).abs();
         while my_rand.to_string().len() < length.try_into().unwrap() {
             my_rand = my_rand + rng.gen_range(_lower_bound, _upper_bound - my_rand);
         }
-        println!("Generated {:?} digit random number between {:?} and {:?}: {:?}", (_upper_bound.to_string().len() - 1), _lower_bound, _upper_bound - 1 , my_rand);
+        println!(
+            "Generated {:?} digit random number between {:?} and {:?}: {:?}",
+            (_upper_bound.to_string().len() - 1),
+            _lower_bound,
+            _upper_bound - 1,
+            my_rand
+        );
         Ok(my_rand)
     }
 
     /// Join the time and random numbers from above to form a unique 19 digit key (to completely fill an i64 variable)
     /// Also make sure that the number is absolute (not negative) and does not exceed the max value of i64 (which is 9223372036854775807)
     pub fn create_unique_key() -> Result<i64, String> {
-        let a = format!("{:?}{:?}", get_time().unwrap(), create_fixed_length_random_number(1, 1000000000).unwrap());
+        let a = format!(
+            "{:?}{:?}",
+            get_time().unwrap(),
+            create_fixed_length_random_number(1, 1000000000).unwrap()
+        );
         let my_int: i64 = a.parse().unwrap();
         assert!(my_int.is_positive());
         assert!(my_int <= i64::max_value());
@@ -165,19 +180,26 @@ mod store {
         // TODO SSVM::beginStoreTx()
 
         // Find the length of the raw string in terms of unicode scalar values
-        //let raw_string_length: i32 = raw_string.chars().count();
+        let raw_string_length: i32 = raw_string.chars().count();
         // Ensure that the number that represents the length of the string is going to fit inside a i32 variable
         //assert!(raw_string_length <= i32::max_value());
         // Also make sure that the number that represents the length of the string has not overflowed i.e. is greater than 2147483647
-        
+
         // Place the length of the raw string into the first slot of the sequence
         //println!("Adding the length ( {:?} ) of the raw string to the first slot.", raw_string_length);
         // TODO SSVM::storei32(char as i32);
 
         // Storing each of the unicode scalar values to slots
+        const MAX: i32 = i32::max_value();
+        let mut live_char_count: i64 = 0;
         for single_char in raw_string.chars() {
-            println!("Adding {:?}", single_char);
+            live_char_count = live_char_count + 1;
+            if live_char_count < MAX.into() {
+                println!("Adding {:?}", single_char);
             // TODO SSVM:: storei32(char as i32);
+            } else {
+                panic!("The current size of characters in this string({:?}), has reached the limit({:?}) of what we can store in an i32 variable.");
+            }
         }
         // Return the new unique key to the calling code
         new_key
