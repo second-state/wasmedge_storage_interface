@@ -236,3 +236,78 @@ mod tests {
         assert_eq!(19, num5.to_string().len());
     }
 }
+
+// # TODO 
+// Implement the official function names as shown below
+/*
+1. begin_store_tx
+2. store_i32
+3. load_i32
+4. store_i64
+5. load_i64
+6. end_store_tx
+*/
+
+// Write the remaining functions
+/*
+1. load_string
+list any more here and then check them off when complete
+5. load_single_i32 which will contain load_i32
+6. load_single_i64 which will contain load_i64
+7. store_single_i32 which will contain store_i32
+8. store_single_i64 which will contain store_i64
+*/
+
+//Create native.rs file to set the real native functions
+/*
+extern "C" {
+    pub fn ssvm_storage_beginStoreTx();
+    pub fn ssvm_storage_storeI32();
+    pub fn ssvm_storage_loadI32();
+    pub fn ssvm_storage_storeI64();
+    pub fn ssvm_storage_loadI64();
+    pub fn ssvm_storage_endStoreTx();
+}
+*/
+
+// TODO
+// Implement other types of data structures i.e. serialize structs etc.
+// Here is a simple example of how we serialise a PhotonImage struct using bincode
+// This type of code needs to be implementable at high level Rust -> Wasm source code
+// Ultimately we can then save complex objects such as custom structs
+
+/*
+use serde::{Deserialize, Serialize};
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+struct PhotonImage {
+    raw_pixels: Vec<u8>,
+    width: u32,
+    height: u32,
+}
+fn main() {
+    let photon_image = PhotonImage {
+        raw_pixels: vec![
+            134, 122, 131, 255, 131, 131, 139, 255, 135, 134, 137, 255, 138, 134, 130, 255, 126,
+            125, 119, 255, 131, 134, 129, 255, 137, 134, 132, 255, 130, 126, 130, 255, 132, 125,
+            132, 255, 122, 142, 129, 255, 134, 135, 128, 255, 138, 120, 125, 255, 125, 134, 110,
+            255, 121, 122, 137, 255, 141, 140, 141, 255, 125, 144, 120, 255,
+        ],
+        width: 4,
+        height: 4,
+    };
+    let encoded: Vec<u8> = bincode::serialize(&photon_image).unwrap();
+    println!(
+        "This is the completely serialized object as a byte array: {:?} \n",
+        encoded
+    );
+    let decoded: PhotonImage = bincode::deserialize(&encoded[..]).unwrap();
+    println!(
+        "Here is the high level Rust representation of the object: {:?} \n",
+        decoded
+    );
+}
+
+This is the completely serialized object as a byte array: [64, 0, 0, 0, 0, 0, 0, 0, 134, 122, 131, 255, 131, 131, 139, 255, 135, 134, 137, 255, 138, 134, 130, 255, 126, 125, 119, 255, 131, 134, 129, 255, 137, 134, 132, 255, 130, 126, 130, 255, 132, 125, 132, 255, 122, 142, 129, 255, 134, 135, 128, 255, 138, 120, 125, 255, 125, 134, 110, 255, 121, 122, 137, 255, 141, 140, 141, 255, 125, 144, 120, 255, 4, 0, 0, 0, 4, 0, 0, 0] 
+Here is the high level Rust representation of the object: PhotonImage { raw_pixels: [134, 122, 131, 255, 131, 131, 139, 255, 135, 134, 137, 255, 138, 134, 130, 255, 126, 125, 119, 255, 131, 134, 129, 255, 137, 134, 132, 255, 130, 126, 130, 255, 132, 125, 132, 255, 122, 142, 129, 255, 134, 135, 128, 255, 138, 120, 125, 255, 125, 134, 110, 255, 121, 122, 137, 255, 141, 140, 141, 255, 125, 144, 120, 255], width: 4, height: 4 } 
+
+*/
