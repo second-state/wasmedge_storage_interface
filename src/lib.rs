@@ -67,8 +67,8 @@ mod ssvm_storage {
             // placeholder for now is 1
             1
         }
-        
-        //! let new_string: String = ssvm_storage::load::load_string(storage_key);
+
+        /// let new_string: String = ssvm_storage::load::load_string(storage_key);
         pub fn load_string(_key: i64) -> String {
             // The first thing we do is call SSVM database using the key and this will return (a list of i32s)
             // Just for now though, the test i32 is currently 7170388 which is equivalent to the String "Tim". Obviouisly longer strings will be stored in many i32s
@@ -185,8 +185,8 @@ mod ssvm_storage {
             new_key
         }
 
-        //! let my_string = String::from("A string to store");
-        //! let storage_key: i64 = ssvm_storage::store::store_string(&my_string);
+        /// let my_string = String::from("A string to store");
+        /// let storage_key: i64 = ssvm_storage::store::store_string(&my_string);
         pub fn store_string(_value: &str) -> i64 {
             let new_key: i64 = create_unique_key().unwrap();
             // Take an example string
