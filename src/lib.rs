@@ -3,43 +3,44 @@
 //! # Add as a dependency
 //! Add the following line to the `[dependencies]` section of your applications `Cargo.toml` file (please confirm latest version number at [crates.io](https://crates.io/crates/rust_storage_interface_library))
 //! ```
-//! rust_storage_interface_library = "0.1.8"
+//! [dependencies]
+//! rust_storage_interface_library = "^0.1"
 //! ```
 //! # Bring into scope
 //! ```
-//! use rust_storage_interface_library::{store, load};
+//! use rust_storage_interface_library::ssvm_storage;
+//! ```
+//! # Store and load a String
+//! This essentially stores and loads high level objects like strings by serializing them into an array of i32 variables. All you need to do is use the following simple syntax
+//!```
+//! let my_string = String::from("A string to store");
+//! let storage_key: i64 = ssvm_storage::store::store_string(&my_string);
+//! let new_string: String = ssvm_storage::load::load_string(storage_key);
+//!```
+//!
+//! # Load a single i32
+//! ```
+//! let my_previously_stored_i32_value: i32 = ssvm_storage::load::loadi32(my_previously_saved_key: i64)
+//! ```
+//! 
+//! # Load a single i64
+//! ```
+//! let my_previously_stored_i64_value: i64 = ssvm_storage::load::loadi64(my_previously_saved_key)
 //! ```
 //!
-//!
-//!
-//!
-//! Load i32
-//! # Examples
-//! ```
-//! let my_previously_stored_i32_value: i32 = rust_storage_interface_library::load::loadi32(my_previously_saved_key: i64)
-//! ```
-//!
-//! Load i64
-//! # Examples
-//! ```
-//! let my_previously_stored_i64_value: i64 = rust_storage_interface_library::load::loadi64(my_previously_saved_key)
-//! ```
-//!
-//! Store i32
+//! # Store a single i32
 //! Stores a single i32 value and returns a key which can be used to fetch the stored i32 value at a later date
-//! # Examples
 //! ```
 //! my_i32_to_store: i32 = 88;
-//! my_new_key: i64 = rust_storage_interface_library::store::storei32(my_i32_to_store)
+//! my_new_key: i64 = ssvm_storage::store::storei32(my_i32_to_store)
 //!
 //! ```
 //!
-//! Store i64
+//! # Store a single i64
 //! Stores a single i64 value and returns a key which can be used to fetch the stored i64 value at a later date
-//! # Examples
 //! ```
 //! my_i64_to_store: i64 = 88;
-//! my_new_key: i64 = rust_storage_interface_library::store::storei64(my_i64_to_store)
+//! my_new_key: i64 = ssvm_storage::store::storei64(my_i64_to_store)
 //!
 //! ```
 mod ssvm_storage {
@@ -48,7 +49,7 @@ mod ssvm_storage {
         /// Load i32
         /// # Examples
         /// ```
-        /// let my_previously_stored_i32_value: i32 = rust_storage_interface_library::load::loadi32(my_previously_saved_key: i64)
+        /// let my_previously_stored_i32_value: i32 = ssvm_storage::load::loadi32(my_previously_saved_key: i64)
         /// ```
         pub fn load_single_i32(_key: i64) -> i32 {
             // TODO - will require the syntax to interact with SecondState's other native library for SSVM which provides the database interaction
@@ -59,7 +60,7 @@ mod ssvm_storage {
         /// Load i64
         /// # Examples
         /// ```
-        /// let my_previously_stored_i64_value: i64 = rust_storage_interface_library::load::loadi64(my_previously_saved_key)
+        /// let my_previously_stored_i64_value: i64 = ssvm_storage::load::loadi64(my_previously_saved_key)
         /// ```
         pub fn load_single_i64(_key: i64) -> i64 {
             // TODO - will require the syntax to interact with SecondState's other native library for SSVM which provides the database interaction
@@ -158,7 +159,7 @@ mod ssvm_storage {
         /// # Examples
         /// ```
         /// my_i32_to_store: i32 = 88;
-        /// my_new_key: i64 = rust_storage_interface_library::store::storei32(my_i32_to_store)
+        /// my_new_key: i64 = ssvm_storage::store::storei32(my_i32_to_store)
         ///
         /// ```
         pub fn store_single_i32(_value: i32) -> i64 {
@@ -173,7 +174,7 @@ mod ssvm_storage {
         /// # Examples
         /// ```
         /// my_i64_to_store: i64 = 88;
-        /// my_new_key: i64 = rust_storage_interface_library::store::storei64(my_i64_to_store)
+        /// my_new_key: i64 = ssvm_storage::store::storei64(my_i64_to_store)
         ///
         /// ```
         pub fn store_single_i64(_value: i64) -> i64 {
