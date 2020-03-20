@@ -51,15 +51,16 @@ mod ssvm_storage {
             pub fn ssvm_storage_beginStoreTx(new_i64_key: i64);
             pub fn ssvm_storage_beginLoadTx(new_i64_key: i64);
             pub fn ssvm_storage_storeI32(_i32_value: i32);
-            pub fn ssvm_storage_loadI32(_i64_key: i64) -> i32;
+            pub fn ssvm_storage_loadI32() -> i32;
             pub fn ssvm_storage_storeI64(_i64_value: i64);
-            pub fn ssvm_storage_loadI64(_i64_key: i64) -> i64;
+            pub fn ssvm_storage_loadI64() -> i64;
             pub fn ssvm_storage_endStoreTx();
             pub fn ssvm_storage_endLoadTx();
         }
     }
     pub mod load {
         use super::ssvm_native;
+        use std::char;
         // Documentation for load module
         /// Load i32
         /// # Examples
@@ -69,7 +70,7 @@ mod ssvm_storage {
         pub fn load_single_i32(_i64_key: i64) -> i32 {
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i64_key);
-                let fetched_i32_value: i32 = ssvm_native::ssvm_storage_loadI32(_i64_key);
+                let fetched_i32_value: i32 = ssvm_native::ssvm_storage_loadI32();
                 ssvm_native::ssvm_storage_endLoadTx();
                 return fetched_i32_value;
             }
@@ -83,7 +84,7 @@ mod ssvm_storage {
         pub fn load_single_i64(_i64_key: i64) -> i64 {
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i64_key);
-                let fetched_i64_value: i64 = ssvm_native::ssvm_storage_loadI64(_i64_key);
+                let fetched_i64_value: i64 = ssvm_native::ssvm_storage_loadI64();
                 ssvm_native::ssvm_storage_endLoadTx();
                 return fetched_i64_value;
             }
@@ -91,35 +92,18 @@ mod ssvm_storage {
 
         /// let new_string: String = ssvm_storage::load::load_string(storage_key);
         pub fn load_string(_i64_key: i64) -> String {
-            // The first thing we do is call SSVM database using the key and this will return (a list of i32s)
-            // Just for now though, the test i32 is currently 7170388 which is equivalent to the String "Tim". Obviouisly longer strings will be stored in many i32s
-            // For strings which are stored across many i32s we will be calling the database many times using the master key using its sequential suffix
-            let _call_database_using_key: i32 = 7170388;
-            // We need to convert each i32 to little endian bytes like this
-            let value_as_le_bytes = _call_database_using_key.to_le_bytes();
-            // TODO use the i32 that we fetched instead of this concrete value 7170388 above
-            println!(
-                "The i32 integer as little endian bytes: {:?}",
-                value_as_le_bytes
-            );
-            // Output
-            // The i32 integer as little endian bytes: [84, 105, 109, 0]
-
-            // We now get the bytes into a vector and clean out the zeros that we may have used to fill the batch
-            let mut vec_for_string = value_as_le_bytes.to_vec();
-            while vec_for_string.get(vec_for_string.len() - 1) == Some(&0) {
-                println!("Found a zero at position: {:?}", vec_for_string.len() - 1);
-                vec_for_string.remove(vec_for_string.len() - 1);
+            unsafe {
+                let mut the_string = String::from("");
+                ssvm_native::ssvm_storage_beginLoadTx(_i64_key);
+                let number_of_chars: i32 = ssvm_native::ssvm_storage_loadI32();
+                for i in 1..number_of_chars {
+                    let i32_char_representation: i32 = ssvm_native::ssvm_storage_loadI32();
+                    let u32_char: u32 = i32_char_representation as u32;
+                    let the_char: char = char::from_u32(u32_char).unwrap();
+                    the_string.push(the_char);
+                }
+                the_string
             }
-            // Output
-            // Found a zero at position: 3
-
-            // Lastly we pass the vec into the String::from_utf8
-            let re_string = String::from_utf8(vec_for_string).unwrap();
-            println!("String of bytes as string again: {:?}", re_string);
-            // Output
-            // String of bytes as string again: "Tim"
-            String::from("Tim") // Placeholder
         }
     }
 
@@ -235,8 +219,11 @@ mod ssvm_storage {
                 live_char_count = live_char_count + 1;
                 if live_char_count < MAX.into() {
                     println!("Adding {:?}", single_char);
+                    // A char can always be safely cast to a u32
+                    let u32_single_char: u32 = single_char as u32;
                     unsafe {
-                        ssvm_native::ssvm_storage_storeI32(single_char as i32);
+                        // We then store this as i32 because this is WebAssembly compatible data type
+                        ssvm_native::ssvm_storage_storeI32(u32_single_char as i32);
                     }
                 } else {
                     panic!("The current size of characters in this string({:?}), has reached the limit({:?}) of what we can store in an i32 variable.");
@@ -283,78 +270,3 @@ mod tests {
         assert_eq!(19, num5.to_string().len());
     }
 }
-
-// # TODO
-// Implement the official function names as shown below
-/*
-1. begin_store_tx
-2. store_i32
-3. load_i32
-4. store_i64
-5. load_i64
-6. end_store_tx
-*/
-
-// Write the remaining functions
-/*
-1. load_string
-list any more here and then check them off when complete
-5. load_single_i32 which will contain load_i32
-6. load_single_i64 which will contain load_i64
-7. store_single_i32 which will contain store_i32
-8. store_single_i64 which will contain store_i64
-*/
-
-//Create native.rs file to set the real native functions
-/*
-extern "C" {
-    pub fn ssvm_storage_beginStoreTx();
-    pub fn ssvm_storage_storeI32();
-    pub fn ssvm_storage_loadI32();
-    pub fn ssvm_storage_storeI64();
-    pub fn ssvm_storage_loadI64();
-    pub fn ssvm_storage_endStoreTx();
-}
-*/
-
-// TODO
-// Implement other types of data structures i.e. serialize structs etc.
-// Here is a simple example of how we serialise a PhotonImage struct using bincode
-// This type of code needs to be implementable at high level Rust -> Wasm source code
-// Ultimately we can then save complex objects such as custom structs
-
-/*
-use serde::{Deserialize, Serialize};
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
-struct PhotonImage {
-    raw_pixels: Vec<u8>,
-    width: u32,
-    height: u32,
-}
-fn main() {
-    let photon_image = PhotonImage {
-        raw_pixels: vec![
-            134, 122, 131, 255, 131, 131, 139, 255, 135, 134, 137, 255, 138, 134, 130, 255, 126,
-            125, 119, 255, 131, 134, 129, 255, 137, 134, 132, 255, 130, 126, 130, 255, 132, 125,
-            132, 255, 122, 142, 129, 255, 134, 135, 128, 255, 138, 120, 125, 255, 125, 134, 110,
-            255, 121, 122, 137, 255, 141, 140, 141, 255, 125, 144, 120, 255,
-        ],
-        width: 4,
-        height: 4,
-    };
-    let encoded: Vec<u8> = bincode::serialize(&photon_image).unwrap();
-    println!(
-        "This is the completely serialized object as a byte array: {:?} \n",
-        encoded
-    );
-    let decoded: PhotonImage = bincode::deserialize(&encoded[..]).unwrap();
-    println!(
-        "Here is the high level Rust representation of the object: {:?} \n",
-        decoded
-    );
-}
-
-This is the completely serialized object as a byte array: [64, 0, 0, 0, 0, 0, 0, 0, 134, 122, 131, 255, 131, 131, 139, 255, 135, 134, 137, 255, 138, 134, 130, 255, 126, 125, 119, 255, 131, 134, 129, 255, 137, 134, 132, 255, 130, 126, 130, 255, 132, 125, 132, 255, 122, 142, 129, 255, 134, 135, 128, 255, 138, 120, 125, 255, 125, 134, 110, 255, 121, 122, 137, 255, 141, 140, 141, 255, 125, 144, 120, 255, 4, 0, 0, 0, 4, 0, 0, 0]
-Here is the high level Rust representation of the object: PhotonImage { raw_pixels: [134, 122, 131, 255, 131, 131, 139, 255, 135, 134, 137, 255, 138, 134, 130, 255, 126, 125, 119, 255, 131, 134, 129, 255, 137, 134, 132, 255, 130, 126, 130, 255, 132, 125, 132, 255, 122, 142, 129, 255, 134, 135, 128, 255, 138, 120, 125, 255, 125, 134, 110, 255, 121, 122, 137, 255, 141, 140, 141, 255, 125, 144, 120, 255], width: 4, height: 4 }
-
-*/
