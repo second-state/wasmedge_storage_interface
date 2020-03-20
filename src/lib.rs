@@ -48,6 +48,7 @@ mod ssvm_storage {
 
     pub mod ssvm_native {
         extern "C" {
+            pub fn ssvm_storage_createUUID() -> i64;
             pub fn ssvm_storage_beginStoreTx(new_i64_key: i64);
             pub fn ssvm_storage_beginLoadTx(new_i64_key: i64);
             pub fn ssvm_storage_storeI32(_i32_value: i32);
@@ -58,8 +59,21 @@ mod ssvm_storage {
             pub fn ssvm_storage_endLoadTx();
         }
     }
+
+    mod utils {
+        use super::ssvm_native;
+        pub fn create_key_via_ssvm() -> i64 {
+            unsafe {
+                let new_i64_key: i64 = ssvm_native::ssvm_storage_createUUID();
+                new_i64_key
+            }
+        }
+
+    }
+
     pub mod load {
         use super::ssvm_native;
+        use super::utils;
         use std::char;
         // Documentation for load module
         /// Load i32
@@ -96,7 +110,7 @@ mod ssvm_storage {
                 let mut the_string = String::from("");
                 ssvm_native::ssvm_storage_beginLoadTx(_i64_key);
                 let number_of_chars: i32 = ssvm_native::ssvm_storage_loadI32();
-                for i in 1..number_of_chars {
+                for i in 1..number_of_chars { // TODO do we start from 1 or zero here ????????????????????????????????????????????????????????????????????????????????????????
                     let i32_char_representation: i32 = ssvm_native::ssvm_storage_loadI32();
                     let u32_char: u32 = i32_char_representation as u32;
                     let the_char: char = char::from_u32(u32_char).unwrap();
@@ -110,6 +124,7 @@ mod ssvm_storage {
     pub mod store {
         use super::ssvm_native;
         use rand::Rng;
+        use super::utils;
         extern crate rand;
         use std::convert::TryInto;
         use std::time::SystemTime;
@@ -169,7 +184,7 @@ mod ssvm_storage {
         ///
         /// ```
         pub fn store_single_i32(_i32_value: i32) -> i64 {
-            let new_i64_key: i64 = create_unique_key().unwrap();
+            let new_i64_key: i64 = utils::create_key_via_ssvm();
             unsafe {
                 ssvm_native::ssvm_storage_beginStoreTx(new_i64_key);
                 ssvm_native::ssvm_storage_storeI32(_i32_value);
@@ -187,7 +202,7 @@ mod ssvm_storage {
         ///
         /// ```
         pub fn store_single_i64(_i64_value: i64) -> i64 {
-            let new_i64_key: i64 = create_unique_key().unwrap();
+            let new_i64_key: i64 = utils::create_key_via_ssvm();
             unsafe {
                 ssvm_native::ssvm_storage_beginStoreTx(new_i64_key);
                 ssvm_native::ssvm_storage_storeI64(_i64_value);
@@ -199,12 +214,13 @@ mod ssvm_storage {
         /// let my_string = String::from("A string to store");
         /// let storage_key: i64 = ssvm_storage::store::store_string(&my_string);
         pub fn store_string(_string_value: &str) -> i64 {
-            let new_i64_key: i64 = create_unique_key().unwrap();
+            let new_i64_key: i64 = utils::create_key_via_ssvm();
             // Take an example string
             let raw_string = String::from(_string_value);
             // Start the storage transaction
             println!("Starting the storage transaction");
             unsafe {
+                //let new_i64_key: i64 = ssvm_native::ssvm_storage_createUUID();
                 ssvm_native::ssvm_storage_beginStoreTx(new_i64_key);
             }
             // Find the length of the raw string in terms of unicode scalar values
