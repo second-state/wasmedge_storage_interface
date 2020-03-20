@@ -43,6 +43,8 @@
 //! my_new_key: i64 = ssvm_storage::store::storei64(my_i64_to_store)
 //!
 //! ```
+mod native;
+
 mod ssvm_storage {
     pub mod load {
         // Documentation for load module
