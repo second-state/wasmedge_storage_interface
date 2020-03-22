@@ -12,27 +12,21 @@ struct PhotonImage {
 fn exceeding_max_i32_threshold(_num: i64) -> bool {
     const MAX: i32 = i32::max_value();
     if _num >= i32::max_value().into() {
-        //println!("Sorry, {:?}, exceeds the maximum allowable data length which can be saved as an i32 number", _num);
         true
     } else {
-        //println!("Data length, of {:?} is within the i32 threshold, continue ... ",_num);
         false
     }
 }
 
 fn count_vec_items_left(_vec: &Vec<u8>) -> i32 {
     let items_left: i32 = _vec.len().try_into().unwrap();
-    //println!("{:?}, items left to process", items_left);
     items_left
 }
 
 fn flush_value_to_zero(_value: &mut i32, _position: i32, _size: i32) {
-    //println!("Flushing Value ... \n Original value: {:?}", _value);
     *_value = *_value
         - ((*_value % (10_i32.pow(_position.try_into().unwrap())))
             - (*_value % (10_i32.pow((_position - _size).try_into().unwrap()))));
-    //println!("Updated value: {:?}", _value);
-    //_value
 }
 
 fn insert_value_at_position(_value: &mut i32, _single_value: i32, _position: i32, _size: i32) {
@@ -41,14 +35,10 @@ fn insert_value_at_position(_value: &mut i32, _single_value: i32, _position: i32
         string_single_value = "0".to_owned() + &string_single_value;
     }
     let new_single_value = string_single_value.parse::<i32>();
-    //println!("Inserting new value ... \n Original value: {:?}", _value);
     *_value = *_value + new_single_value.unwrap() * (10_i32.pow((_position - _size).try_into().unwrap()));
-    //println!("Updated value: {:?}", _value);
-    //_value
 }
 
 fn access_value(_value: i64, _position: i64, _size: i64) -> i64 {
-	//               ((_value % (10 ** _position                          )) - (_value % (10 **      (_position - _size)                     ))) / (10 **      (_position - _size)                     )
     let _mode: i64 = ((_value % (10_i64.pow(_position.try_into().unwrap()))) - (_value % (10_i64.pow((_position - _size).try_into().unwrap())))) / (10_i64.pow((_position - _size).try_into().unwrap()));
     return _mode
 }
@@ -76,7 +66,6 @@ fn main() {
     println!("");
     let num_bytes = encoded.len();
     // Serialisation
-    //
 
     // Create vector to hold the i32's
     let mut vec_of_i32s: Vec<i32> = Vec::new();
@@ -140,7 +129,6 @@ fn main() {
             //println!("Vector u8s left to process -> {:?}", encoded);
         }
     }
-    //println!("Finished processing");
     println!("{:?}", vec_of_i32s);
     println!("");
     println!("We have essentially packed {:?} u8's into {:?} i32's", num_bytes, vec_of_i32s.len());
@@ -174,7 +162,7 @@ fn main() {
 
 
 
-// Unit tests for later on when this becomes a library
+// More unit tests like this are needed later on when this becomes a library
     /*
 
     ////println!("{:?}");
