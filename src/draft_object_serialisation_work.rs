@@ -47,6 +47,12 @@ fn insert_value_at_position(_value: &mut i32, _single_value: i32, _position: i32
     //_value
 }
 
+fn access_value(_value: i64, _position: i64, _size: i64) -> i64 {
+	//               ((_value % (10 ** _position                          )) - (_value % (10 **      (_position - _size)                     ))) / (10 **      (_position - _size)                     )
+    let _mode: i64 = ((_value % (10_i64.pow(_position.try_into().unwrap()))) - (_value % (10_i64.pow((_position - _size).try_into().unwrap())))) / (10_i64.pow((_position - _size).try_into().unwrap()));
+    return _mode
+}
+
 fn main() {
     let photon_image = PhotonImage {
         raw_pixels: vec![
@@ -59,19 +65,23 @@ fn main() {
         height: 4,
     };
 
+    println!("Consider the following high level struct; in this case custom image data in the form of raw pixels, as well as, width and height values");
+    println!("");
+    println!("{:?}",photon_image);
+    println!("");
+    println!("Let's serialize the image struct to a byte array of u8 values (numbers between 0 and 255 only)");
+    println!("");
     let mut encoded: Vec<u8> = bincode::serialize(&photon_image).unwrap();
-    //let mut encoded = vec![64, 0, 0, 0, 0, 0, 0, 0, 134, 122, 131, 255];
-    //for itemu8 in &encoded {
-        //println!("{:?}", *itemu8);
-    //}
-    println!( "This is the completely serialized object as a byte array: {:?} \n",encoded);
-
+    println!( "{:?}",encoded);
+    println!("");
+    let num_bytes = encoded.len();
     // Serialisation
     //
 
     // Create vector to hold the i32's
     let mut vec_of_i32s: Vec<i32> = Vec::new();
-    //println!("Vector of i32s: {:?}", vec_of_i32s);
+    println!("Let's now fill up a bunch of i32 variables with those u8s");
+    println!("");
 
     // Test to see if there are too many i32s to store (we need to store the number of i32s in the first i32 so this can not exceed 2147483647)
     if exceeding_max_i32_threshold(count_vec_items_left(&encoded).into()) == false {
@@ -131,68 +141,37 @@ fn main() {
         }
     }
     //println!("Finished processing");
-    println!("Final encoded i32's ready to be stored in Wasm -> {:?}", vec_of_i32s);
+    println!("{:?}", vec_of_i32s);
+    println!("");
+    println!("We have essentially packed {:?} u8's into {:?} i32's", num_bytes, vec_of_i32s.len());
+    println!("");
+
+    // Decode
+    println!("");
+    println!("These can be decoded back to u8 at any time, as required.");
+    println!("");
+    let mut vec_of_u8s: Vec<u8> = Vec::new();
+    for single_i32_from_vec in vec_of_i32s {
+    	//println!("Processing: {:?}", single_i32_from_vec);
+    	let mode: i64 = access_value(single_i32_from_vec.into(), 10, 1);
+    	if mode == 1 {
+    		//println!("Full: {:?}", single_i32_from_vec);
+    		vec_of_u8s.push(access_value(single_i32_from_vec.into(), 9, 3).try_into().unwrap());
+    		vec_of_u8s.push(access_value(single_i32_from_vec.into(), 6, 3).try_into().unwrap());
+    		vec_of_u8s.push(access_value(single_i32_from_vec.into(), 3, 3).try_into().unwrap());
+    	} 
+    	if mode == 2 {
+    		//println!("Full: {:?}", single_i32_from_vec);
+    		vec_of_u8s.push(access_value(single_i32_from_vec.into(), 6, 3).try_into().unwrap());
+    		vec_of_u8s.push(access_value(single_i32_from_vec.into(), 3, 3).try_into().unwrap());
+    	} 
+    	if mode == 3 {
+    		vec_of_u8s.push(access_value(single_i32_from_vec.into(), 3, 3).try_into().unwrap());
+    	} 
+    }
+        println!("{:?}", vec_of_u8s);
 }
 
-/*
-    let s = String::from_utf8(encoded);
-    //println!("Serialised data as string: {:?}", s);
-
-// 2147483647 is the max - 10 digits
-
-
-    let decoded: PhotonImage = bincode::deserialize(&encoded[..]).unwrap();
-    //println!(
-        "Here is the high level Rust representation of the object: {:?} \n",
-        decoded
-    );
-    */
-
-// encode this [0, 34, 2, 131, 255]
-//Step 1 - count the number of available items left to process
-// If there are 3 or more available numbers then put a one upfront (this is so we can store byte arrays that start with 0)
-// 1
-// 1 always signals that we have a full set of 3 items each ranging from 0 to 255
-
-// Step 2 - take the first 3 items and full the 9 remaining digits
-// Convert the number to 3 digits if it is not already i.e. 0 becomes 000 and 14 becomes 014 etc.
-// 1 000 034 002
-
-//Step 3 - make that an i32 and store it
-// 1000034002
-
-// Step 4 - count the number of leftovers
-// if there are 2 left overs, place a number 2 upfront, if there is only one left over place a number 3 upfront
-// convert numbers to 3 digits as above, create i32 and store
-// [131, 55]
-// 2 131 055
-// 2131055
-
-// [55]
-// 3 055
-// 3055
-
-// decode
-// Step 1 - break into leading number (1, 2 or 3) followed by the sets of 3
-// 1 000 034 002
-
-// 2 131 055
-
-// 3 055
-
-// Step 2 - drop the leading zeros
-// [1, 0, 34, 2]
-
-// [2, 131, 55]
-
-// [3, 55]
-
-// Step 3 - drop the 1,2or3 at the start
-// [0, 34, 2]
-
-// [131, 55]
-
-// [55]
 
 
 // Unit tests for later on when this becomes a library
