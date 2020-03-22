@@ -1,49 +1,3 @@
-/*
-The following code is a verbose attempt at getting the logic worked out for converting an arbritrary Vec<u8> to a series of single i32 values. Values which we can store using the C interface of this project. At present we are able to pack sets of 4 u8's into an i32. More work on this will continue in the next couple of days. This is very promising. Here are results from the latest test just run.
-tpmccallum@Tims-MBP bincode_example % ./target/debug/bincode_example
-64
-0
-0
-0
-0
-0
-0
-0
-134
-122
-131
-255
-This is the completely serialized object as a byte array: [64, 0, 0, 0, 0, 0, 0, 0, 134, 122, 131, 255] 
-
-Vector of i32s: []
-12, items left to process
-Data length, of 12 is within the i32 threshold, continue ... 
-12, items left to process
-One: 64
-Two: 0
-Three: 0
-9, items left to process
-Vector u8s: [0, 0, 0, 0, 0, 134, 122, 131, 255]
-One: 0
-Two: 0
-Three: 0
-Original value: 1000000000
-Updated value: 1000000000
-6, items left to process
-Vector u8s: [0, 0, 134, 122, 131, 255]
-One: 0
-Two: 0
-Three: 134
-3, items left to process
-Vector u8s: [122, 131, 255]
-One: 122
-Two: 131
-Three: 255
-0, items left to process
-Vector u8s: []
-Finished processing
-*/
-
 use serde::{Deserialize, Serialize};
 use std::convert::TryInto;
 use std::mem;
@@ -58,37 +12,39 @@ struct PhotonImage {
 fn exceeding_max_i32_threshold(_num: i64) -> bool {
     const MAX: i32 = i32::max_value();
     if _num >= i32::max_value().into() {
-        println!("Sorry, {:?}, exceeds the maximum allowable data length which can be saved as an i32 number", _num);
+        //println!("Sorry, {:?}, exceeds the maximum allowable data length which can be saved as an i32 number", _num);
         true
     } else {
-        println!(
-            "Data length, of {:?} is within the i32 threshold, continue ... ",
-            _num
-        );
+        //println!("Data length, of {:?} is within the i32 threshold, continue ... ",_num);
         false
     }
 }
 
 fn count_vec_items_left(_vec: &Vec<u8>) -> i32 {
     let items_left: i32 = _vec.len().try_into().unwrap();
-    println!("{:?}, items left to process", items_left);
+    //println!("{:?}, items left to process", items_left);
     items_left
 }
 
-fn flush_value_to_zero(_value: &mut i32, _position: i32, _size: i32) -> &mut i32 {
-    println!("Original value: {:?}", _value);
+fn flush_value_to_zero(_value: &mut i32, _position: i32, _size: i32) {
+    //println!("Flushing Value ... \n Original value: {:?}", _value);
     *_value = *_value
         - ((*_value % (10_i32.pow(_position.try_into().unwrap())))
             - (*_value % (10_i32.pow((_position - _size).try_into().unwrap()))));
-    println!("Updated value: {:?}", _value);
-    _value
+    //println!("Updated value: {:?}", _value);
+    //_value
 }
 
-fn insert_value_at_position(_value: &mut i32, _single_value: i32, _position: i32) -> &mut i32 {
-    println!("Original value: {:?}", _value);
-    *_value + _single_value * (10_i32.pow((_position - 1).try_into().unwrap()));
-    println!("Updated value: {:?}", _value);
-    _value
+fn insert_value_at_position(_value: &mut i32, _single_value: i32, _position: i32, _size: i32) {
+    let mut string_single_value = _single_value.to_string();
+    while string_single_value.len() < _size.try_into().unwrap() {
+        string_single_value = "0".to_owned() + &string_single_value;
+    }
+    let new_single_value = string_single_value.parse::<i32>();
+    //println!("Inserting new value ... \n Original value: {:?}", _value);
+    *_value = *_value + new_single_value.unwrap() * (10_i32.pow((_position - _size).try_into().unwrap()));
+    //println!("Updated value: {:?}", _value);
+    //_value
 }
 
 fn main() {
@@ -103,22 +59,19 @@ fn main() {
         height: 4,
     };
 
-    //let mut encoded: Vec<u8> = bincode::serialize(&photon_image).unwrap();
-    let mut encoded = vec![64, 0, 0, 0, 0, 0, 0, 0, 134, 122, 131, 255];
-    for itemu8 in &encoded {
-        println!("{:?}", *itemu8);
-    }
-    println!(
-        "This is the completely serialized object as a byte array: {:?} \n",
-        encoded
-    );
+    let mut encoded: Vec<u8> = bincode::serialize(&photon_image).unwrap();
+    //let mut encoded = vec![64, 0, 0, 0, 0, 0, 0, 0, 134, 122, 131, 255];
+    //for itemu8 in &encoded {
+        //println!("{:?}", *itemu8);
+    //}
+    println!( "This is the completely serialized object as a byte array: {:?} \n",encoded);
 
     // Serialisation
     //
 
     // Create vector to hold the i32's
     let mut vec_of_i32s: Vec<i32> = Vec::new();
-    println!("Vector of i32s: {:?}", vec_of_i32s);
+    //println!("Vector of i32s: {:?}", vec_of_i32s);
 
     // Test to see if there are too many i32s to store (we need to store the number of i32s in the first i32 so this can not exceed 2147483647)
     if exceeding_max_i32_threshold(count_vec_items_left(&encoded).into()) == false {
@@ -130,50 +83,66 @@ fn main() {
             // See how many items we have left in the serialised Vec<u8>
             if items_left == 1 {
                 let one = &mut encoded.remove(0);
-                println!("One: {:?}", one);
-                if *one == 0 {
-                    insert_value_at_position(&mut single_i32, 3, 9);
-                }
+                //println!("One: {:?}", one);
+                flush_value_to_zero(&mut single_i32, 3, 3);
+                insert_value_at_position(&mut single_i32, *one as i32, 3, 3);
+                // Set the indicator to 3
+                flush_value_to_zero(&mut single_i32, 10, 1);
+                // A single u8 stored in a single i32 will have a prefix of 3 - this is a code used in encoding/decoding
+                insert_value_at_position(&mut single_i32, 3, 10, 1);
             }
             if items_left == 2 {
                 let one = &mut encoded.remove(0);
-                println!("One: {:?}", one);
+                //println!("One: {:?}", one);
                 let two = &mut encoded.remove(0);
-                println!("Two: {:?}", two);
-                if *one == 0 && *two == 0 {
-                    insert_value_at_position(&mut single_i32, 2, 9);
-                }
+                //println!("Two: {:?}", two);
+                flush_value_to_zero(&mut single_i32, 6, 3);
+                insert_value_at_position(&mut single_i32, *one as i32, 6, 3);
+                flush_value_to_zero(&mut single_i32, 3, 3);
+                insert_value_at_position(&mut single_i32, *two as i32, 3, 3);
+                // Set the indicator to 2
+                flush_value_to_zero(&mut single_i32, 10, 1);
+                // When two u8s are stored in a single i32 it will have a prefix of 2 - this is a code used in encoding/decoding
+                insert_value_at_position(&mut single_i32, 2, 10, 1);
             }
             if items_left >= 3 {
                 let one = &mut encoded.remove(0);
-                println!("One: {:?}", one);
+                //println!("One: {:?}", one);
                 let two = &mut encoded.remove(0);
-                println!("Two: {:?}", two);
+                //println!("Two: {:?}", two);
                 let three = &mut encoded.remove(0);
-                println!("Three: {:?}", three);
-                if *one == 0 && *two == 0 && *three == 0 {
-                    insert_value_at_position(&mut single_i32, 1, 9);
-                }
+                //println!("Three: {:?}", three);
+                flush_value_to_zero(&mut single_i32, 9, 3);
+                insert_value_at_position(&mut single_i32, *one as i32, 9, 3);
+                flush_value_to_zero(&mut single_i32, 6, 3);
+                insert_value_at_position(&mut single_i32, *two as i32, 6, 3);
+                flush_value_to_zero(&mut single_i32, 3, 3);
+                insert_value_at_position(&mut single_i32, *three as i32, 3, 3);
+                // Set the indicator to 2
+                flush_value_to_zero(&mut single_i32, 10, 1);
+                // When 3 u8s are stored in a single i32 it will have a prefix of 1 - this is a code used in encoding/decoding
+                insert_value_at_position(&mut single_i32, 1, 10, 1);
             }
             // Calculate the remaining items left to process
             items_left = count_vec_items_left(&encoded);
             // Push this new i32 to the vec_of_i32s
             vec_of_i32s.push(single_i32);
-            println!("Vector u8s: {:?}", encoded);
+            //println!("Vector u8s left to process -> {:?}", encoded);
         }
     }
-    println!("Finished processing");
+    //println!("Finished processing");
+    println!("Final encoded i32's ready to be stored in Wasm -> {:?}", vec_of_i32s);
 }
 
 /*
     let s = String::from_utf8(encoded);
-    println!("Serialised data as string: {:?}", s);
+    //println!("Serialised data as string: {:?}", s);
 
 // 2147483647 is the max - 10 digits
 
 
     let decoded: PhotonImage = bincode::deserialize(&encoded[..]).unwrap();
-    println!(
+    //println!(
         "Here is the high level Rust representation of the object: {:?} \n",
         decoded
     );
@@ -224,3 +193,40 @@ fn main() {
 // [131, 55]
 
 // [55]
+
+
+// Unit tests for later on when this becomes a library
+    /*
+
+    ////println!("{:?}");
+    //
+    let mut _test_single_i32: i32 = 1000000000;
+    //println!("{:?}", _test_single_i32);
+    //
+    flush_value_to_zero(&mut _test_single_i32, 3, 3);
+    assert_eq!(_test_single_i32, 1000000000);
+    //println!("{:?}", _test_single_i32);
+    //
+    insert_value_at_position(&mut _test_single_i32, 333, 9, 3);
+    assert_eq!(_test_single_i32, 1333000000);
+    //println!("{:?}", _test_single_i32);
+    //
+    flush_value_to_zero(&mut _test_single_i32, 9, 3);
+    assert_eq!(_test_single_i32, 1000000000);
+    //println!("{:?}", _test_single_i32);
+    //
+    insert_value_at_position(&mut _test_single_i32, 333, 3, 3);
+    assert_eq!(_test_single_i32, 1000000333);
+    //println!("{:?}", _test_single_i32);
+    //
+    //
+    insert_value_at_position(&mut _test_single_i32, 333, 6, 3);
+    assert_eq!(_test_single_i32, 1000333333);
+    //println!("{:?}", _test_single_i32);
+    //
+    insert_value_at_position(&mut _test_single_i32, 8, 9, 3);
+    assert_eq!(_test_single_i32, 1008333333);
+    //println!("{:?}", _test_single_i32);
+    //
+
+    */
