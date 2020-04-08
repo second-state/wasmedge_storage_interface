@@ -111,10 +111,17 @@ mod ssvm_storage {
         use bincode;
         use serde::{Deserialize, Serialize};
         use serialize_deserialize_u8_i32::s_d_u8_i32;
+        use std::any::type_name;
         use std::convert::TryInto;
 
-        fn generic_store<V: serde::ser::Serialize>(k: i32, v: V) -> i32 {
-            // Encoding any type to Vec<i32>
+        fn type_of<T>(_: T) -> &'static str {
+            type_name::<T>()
+        }
+
+        pub fn store<V: std::clone::Clone + serde::ser::Serialize>(v: V) -> i32 {
+            let type_of_value = type_of(v.clone());
+            println!("{:?}", type_of_value);
+
             let encoded_as_u8: Vec<u8> = bincode::serialize(&v).unwrap();
             let encoded_as_i32: Vec<i32> = s_d_u8_i32::serialize_u8_to_i32(encoded_as_u8);
             // Begin store
