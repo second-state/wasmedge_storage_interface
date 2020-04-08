@@ -113,13 +113,14 @@ mod ssvm_storage {
         use serialize_deserialize_u8_i32::s_d_u8_i32;
         use std::convert::TryInto;
 
-        pub fn generic_store<V: serde::ser::Serialize>(k: i32, v: V) {
+        fn generic_store<V: serde::ser::Serialize>(k: i32, v: V) -> i32 {
             // Encoding any type to Vec<i32>
             let encoded_as_u8: Vec<u8> = bincode::serialize(&v).unwrap();
             let encoded_as_i32: Vec<i32> = s_d_u8_i32::serialize_u8_to_i32(encoded_as_u8);
             // Begin store
+            let new_i32_key: i32 = utils::create_key_via_ssvm();
             unsafe {
-                ssvm_native::ssvm_storage_beginStoreTx(k);
+                ssvm_native::ssvm_storage_beginStoreTx(new_i32_key);
             }
             // Add data length
             unsafe {
@@ -135,6 +136,7 @@ mod ssvm_storage {
             unsafe {
                 ssvm_native::ssvm_storage_endStoreTx();
             }
+            new_i32_key
         }
     }
 }
