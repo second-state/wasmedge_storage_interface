@@ -11,6 +11,8 @@ description = "A Rust library that provides Rust to WebAssembly developers with 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = "0.7.3"
+bincode = "^1.2"
+serialize_deserialize_u8_i32 = "^0.1"
+serde = { version = "1.0.105", features = ["derive"] }
 
 
