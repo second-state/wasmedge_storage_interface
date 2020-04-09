@@ -86,15 +86,25 @@ mod ssvm_storage {
                 return character;
             }
         }
-        /*
+        pub fn deserialize_vec_i32_to_i8(_value: Vec<i32>) -> i8 {
+            let deserialized_to_u8: Vec<u8> = s_d_u8_i32::deserialize_i32_to_u8(_value);
+            let deserialized_to_i8: i8 = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
+            deserialized_to_i8
+        }
         pub fn load_as_i8(_i32_key: i32) -> i8 {
+            let mut i8_vec = Vec::new();
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
-                let fetched_i32_value: i32 = ssvm_native::ssvm_storage_loadI32();
+                let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
+                for i in 0..number_of_i32s {
+                    i8_vec.push(ssvm_native::ssvm_storage_loadI32());
+                }
+                let i8_value: i8 = deserialize_vec_i32_to_i8(i8_vec);
                 ssvm_native::ssvm_storage_endLoadTx();
-                return fetched_i32_value;
+                return i8_value;
             }
         }
+        /*
         pub fn load_as_i16(_i32_key: i32) -> i16 {
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
@@ -271,6 +281,25 @@ mod tests {
         let character2 = ssvm_storage::load::deserialize_vec_i32_to_char(encoded_as_i32);
         println!("Decoded as character: {:?}", character2);
         assert_eq!(character2, 'a');
+    }
+    #[test]
+    fn test_store_as_i8() {
+        let i81: i8 = -2;
+        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&i81);
+        println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
+        assert_eq!(i81, -2);
+        assert_eq!(ssvm_storage::store::type_of(i81), "i8");
+        assert_eq!(encoded_as_i32.len(), 1);
+        assert_eq!(encoded_as_i32[0], 254);
+    }
+    #[test]
+    fn test_load_as_i8() {
+        let i81: i8 = -2;
+        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&i81);
+        println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
+        let i82 = ssvm_storage::load::deserialize_vec_i32_to_i8(encoded_as_i32);
+        println!("Decoded as i8: {:?}", i82);
+        assert_eq!(i82, -2);
     }
 
     /*
