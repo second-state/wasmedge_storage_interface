@@ -1,14 +1,18 @@
-///
-/// # Adding this as a dependency
-/// ```
-/// [dependencies]
-/// rust_storage_interface_library = "^0.1"
-/// ```
-///
-/// # Bringing this into scope
-/// ```
-/// use rust_storage_interface_library::ssvm_storage;
-/// ```
+//!
+//! # Adding this as a dependency
+//! ```
+//! [dependencies]
+//! rust_storage_interface_library = "^0.1"
+//! ```
+//!
+//! # Bringing this into scope
+//! ```
+//! use rust_storage_interface_library::ssvm_storage;
+//! ```
+//! # Tests
+//! ```
+//! cargo test --lib
+//! ```
 mod ssvm_storage {
 
     pub mod ssvm_native {
@@ -230,6 +234,18 @@ mod ssvm_storage {
         /// ```
         /// let my_string = String::from("A string to store");
         /// let storage_key: i32 = ssvm_storage::store::store(my_string);
+        /// ```
+
+        /// # Store Struct
+        /// Please note, you must implement the serde features as show below. For example the Default feature is used when re-loading this data back from storage.
+        /// ```
+        /// #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+        ///     struct TestStruct {
+        ///         a_vec: Vec<u8>,
+        ///         a_i32: i32,
+        ///         a_u8: u8,
+        ///         a_bool: bool,
+        ///     }
         /// ```
         pub fn store<V: std::clone::Clone + serde::ser::Serialize>(v: V) -> i32 {
             let type_of_value = type_of(v.clone());
