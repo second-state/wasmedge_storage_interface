@@ -122,23 +122,43 @@ mod ssvm_storage {
                 return i16_value;
             }
         }
-        /*
+        pub fn deserialize_vec_i32_to_i32(_value: Vec<i32>) -> i32 {
+            let deserialized_to_u8: Vec<u8> = s_d_u8_i32::deserialize_i32_to_u8(_value);
+            let deserialized_to_i32: i32 = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
+            deserialized_to_i32
+        }
         pub fn load_as_i32(_i32_key: i32) -> i32 {
+            let mut i32_vec = Vec::new();
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
-                let fetched_i32_value: i32 = ssvm_native::ssvm_storage_loadI32();
+                let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
+                for i in 0..number_of_i32s {
+                    i32_vec.push(ssvm_native::ssvm_storage_loadI32());
+                }
+                let i32_value: i32 = deserialize_vec_i32_to_i32(i32_vec);
                 ssvm_native::ssvm_storage_endLoadTx();
-                return fetched_i32_value;
+                return i32_value;
             }
+        }
+        pub fn deserialize_vec_i32_to_i64(_value: Vec<i32>) -> i64 {
+            let deserialized_to_u8: Vec<u8> = s_d_u8_i32::deserialize_i32_to_u8(_value);
+            let deserialized_to_i64: i64 = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
+            deserialized_to_i64
         }
         pub fn load_as_i64(_i32_key: i32) -> i64 {
+            let mut i64_vec = Vec::new();
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
-                let fetched_i32_value: i32 = ssvm_native::ssvm_storage_loadI32();
+                let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
+                for i in 0..number_of_i32s {
+                    i64_vec.push(ssvm_native::ssvm_storage_loadI32());
+                }
+                let i64_value: i64 = deserialize_vec_i32_to_i64(i64_vec);
                 ssvm_native::ssvm_storage_endLoadTx();
-                return fetched_i32_value;
+                return i64_value;
             }
         }
+/*
         pub fn load_as_u8(_i32_key: i32) -> u8 {
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
@@ -330,7 +350,47 @@ mod tests {
         println!("Decoded as i16: {:?}", i162);
         assert_eq!(i162, -2);
     }
-
+    #[test]
+    fn test_store_as_i32() {
+        let i321: i32 = 1234567890;
+        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&i321);
+        println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
+        assert_eq!(i321, 1234567890);
+        assert_eq!(ssvm_storage::store::type_of(i321), "i32");
+        assert_eq!(encoded_as_i32.len(), 2);
+        assert_eq!(encoded_as_i32[0], 1210002150);
+        assert_eq!(encoded_as_i32[1], 73);
+    }
+    #[test]
+    fn test_load_as_i32() {
+        let i321: i32 = 1234567890;
+        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&i321);
+        println!("I32 - Encoded as Vec<i32>: {:?}", encoded_as_i32);
+        let i322 = ssvm_storage::load::deserialize_vec_i32_to_i32(encoded_as_i32);
+        println!("Decoded as i32: {:?}", i322);
+        assert_eq!(i322, 1234567890);
+    }
+    #[test]
+    fn test_store_as_i64() {
+        let i641: i64 = 9223372036854775807;
+        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&i641);
+        println!("I64 - Encoded as Vec<i32>: {:?}", encoded_as_i32);
+        assert_eq!(i641, 9223372036854775807);
+        assert_eq!(ssvm_storage::store::type_of(i641), "i64");
+        assert_eq!(encoded_as_i32.len(), 3);
+        assert_eq!(encoded_as_i32[0], 1255255255);
+        assert_eq!(encoded_as_i32[1], 1255255255);
+        assert_eq!(encoded_as_i32[2], 2000255127);
+    }
+    #[test]
+    fn test_load_as_i64() {
+        let i641: i64 = 9223372036854775807;
+        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&i641);
+        println!("I64 - Encoded as Vec<i32>: {:?}", encoded_as_i32);
+        let i642 = ssvm_storage::load::deserialize_vec_i32_to_i64(encoded_as_i32);
+        println!("Decoded as i64: {:?}", i642);
+        assert_eq!(i642, 9223372036854775807);
+    }
     /*
     #[test]
     fn xxxxxx() {
