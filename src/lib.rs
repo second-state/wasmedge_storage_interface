@@ -1,3 +1,14 @@
+///
+/// # Adding this as a dependency
+/// ```
+/// [dependencies]
+/// rust_storage_interface_library = "^0.1"
+/// ```
+///
+/// # Bringing this into scope
+/// ```
+/// use rust_storage_interface_library::ssvm_storage;
+/// ```
 mod ssvm_storage {
 
     pub mod ssvm_native {
@@ -214,7 +225,12 @@ mod ssvm_storage {
             let encoded_as_i32: Vec<i32> = s_d_u8_i32::serialize_u8_to_i32(encoded_as_u8);
             encoded_as_i32
         }
-
+        ///
+        /// # Store String
+        /// ```
+        /// let my_string = String::from("A string to store");
+        /// let storage_key: i32 = ssvm_storage::store::store(my_string);
+        /// ```
         pub fn store<V: std::clone::Clone + serde::ser::Serialize>(v: V) -> i32 {
             let type_of_value = type_of(v.clone());
             println!("{:?}", type_of_value);
