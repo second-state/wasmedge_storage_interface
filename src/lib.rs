@@ -1,4 +1,3 @@
-
 mod ssvm_storage {
 
     pub mod ssvm_native {
@@ -26,12 +25,15 @@ mod ssvm_storage {
     pub mod load {
         use super::ssvm_native;
         use super::utils;
+        use bincode;
+        use serde::{Deserialize, Serialize};
         use serialize_deserialize_u8_i32::s_d_u8_i32;
         use std::char;
-        use serde::{Deserialize, Serialize};
-        use bincode;
-        
-        pub fn deserialize_vec_i32_to_unknown<'de, T: serde::de::DeserializeOwned>(_value: Vec<i32>, t: T) -> T {
+
+        pub fn deserialize_vec_i32_to_unknown<'de, T: serde::de::DeserializeOwned>(
+            _value: Vec<i32>,
+            t: T,
+        ) -> T {
             let deserialized_to_u8: Vec<u8> = s_d_u8_i32::deserialize_i32_to_u8(_value);
             let deserialized_to_unknown: T = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
             deserialized_to_unknown
@@ -51,7 +53,8 @@ mod ssvm_storage {
         }
         pub fn deserialize_vec_i32_to_bool(_value: Vec<i32>) -> bool {
             let deserialized_to_u8: Vec<u8> = s_d_u8_i32::deserialize_i32_to_u8(_value);
-            let deserialized_to_boolean: bool = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
+            let deserialized_to_boolean: bool =
+                bincode::deserialize(&deserialized_to_u8[..]).unwrap();
             deserialized_to_boolean
         }
         pub fn load_as_bool(_i32_key: i32) -> bool {
@@ -66,7 +69,6 @@ mod ssvm_storage {
                 ssvm_native::ssvm_storage_endLoadTx();
                 return boolean;
             }
-
         }
         pub fn deserialize_vec_i32_to_char(_value: Vec<i32>) -> char {
             let deserialized_to_u8: Vec<u8> = s_d_u8_i32::deserialize_i32_to_u8(_value);
@@ -158,18 +160,24 @@ mod ssvm_storage {
                 return i64_value;
             }
         }
-/*
+        pub fn deserialize_vec_i32_to_u8(_value: Vec<i32>) -> u8 {
+            let deserialized_to_u8: Vec<u8> = s_d_u8_i32::deserialize_i32_to_u8(_value);
+            let deserialized_to_u8: u8 = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
+            deserialized_to_u8
+        }
         pub fn load_as_u8(_i32_key: i32) -> u8 {
+            let mut u8_vec = Vec::new();
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
-                let fetched_i32_value: i32 = ssvm_native::ssvm_storage_loadI32();
+                let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
+                for i in 0..number_of_i32s {
+                    u8_vec.push(ssvm_native::ssvm_storage_loadI32());
+                }
+                let u8_value: u8 = deserialize_vec_i32_to_u8(u8_vec);
                 ssvm_native::ssvm_storage_endLoadTx();
-                return fetched_i32_value;
+                return u8_value;
             }
         }
-
-
-        /// let new_string: String = ssvm_storage::load::load_string(storage_key);
         pub fn load_as_string(_i32_key: i32) -> String {
             unsafe {
                 let mut the_string = String::from("");
@@ -184,7 +192,6 @@ mod ssvm_storage {
                 the_string
             }
         }
-        */
     }
 
     pub mod store {
@@ -200,7 +207,9 @@ mod ssvm_storage {
             type_name::<T>()
         }
 
-        pub fn serialize_unknown_to_vec_i32<V: std::clone::Clone + serde::ser::Serialize>(v: V) -> Vec<i32> {
+        pub fn serialize_unknown_to_vec_i32<V: std::clone::Clone + serde::ser::Serialize>(
+            v: V,
+        ) -> Vec<i32> {
             let encoded_as_u8: Vec<u8> = bincode::serialize(&v).unwrap();
             let encoded_as_i32: Vec<i32> = s_d_u8_i32::serialize_u8_to_i32(encoded_as_u8);
             encoded_as_i32
@@ -236,8 +245,6 @@ mod ssvm_storage {
     }
 }
 
-
-
 // Test
 // Please use the following command so that the print statements are shown during testing
 // cargo test -- --nocapture
@@ -256,18 +263,34 @@ mod tests {
     }
     #[test]
     fn test_store_as_struct() {
-        let test_struct1 = TestStruct {a_vec: vec![134, 122, 131], a_i32: 4, a_u8: 4, a_bool: true};
-        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&test_struct1);
+        let test_struct1 = TestStruct {
+            a_vec: vec![134, 122, 131],
+            a_i32: 4,
+            a_u8: 4,
+            a_bool: true,
+        };
+        let encoded_as_i32: Vec<i32> =
+            ssvm_storage::store::serialize_unknown_to_vec_i32(&test_struct1);
         println!("Encoded as Vec<i32>: {:?}", test_struct1);
-        assert_eq!(ssvm_storage::store::type_of(test_struct1), "rust_storage_interface_library::tests::TestStruct");
+        assert_eq!(
+            ssvm_storage::store::type_of(test_struct1),
+            "rust_storage_interface_library::tests::TestStruct"
+        );
     }
     #[test]
     fn test_load_as_struct() {
-        let test_struct1 = TestStruct {a_vec: vec![134, 122, 131], a_i32: 4, a_u8: 4, a_bool: true};
-        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&test_struct1);
+        let test_struct1 = TestStruct {
+            a_vec: vec![134, 122, 131],
+            a_i32: 4,
+            a_u8: 4,
+            a_bool: true,
+        };
+        let encoded_as_i32: Vec<i32> =
+            ssvm_storage::store::serialize_unknown_to_vec_i32(&test_struct1);
         println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
         let test_struct2 = TestStruct::default();
-        let test_struct3 = ssvm_storage::load::deserialize_vec_i32_to_unknown(encoded_as_i32, test_struct2);
+        let test_struct3 =
+            ssvm_storage::load::deserialize_vec_i32_to_unknown(encoded_as_i32, test_struct2);
         println!("Decoded as unknown: {:?}", test_struct3);
         assert_eq!(test_struct3.a_vec[0], 134);
         assert_eq!(test_struct3.a_i32, 4);
@@ -296,7 +319,8 @@ mod tests {
     #[test]
     fn test_store_as_char() {
         let character1: char = 'a';
-        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&character1);
+        let encoded_as_i32: Vec<i32> =
+            ssvm_storage::store::serialize_unknown_to_vec_i32(&character1);
         println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
         assert_eq!(character1, 'a');
         assert_eq!(ssvm_storage::store::type_of(character1), "char");
@@ -306,7 +330,8 @@ mod tests {
     #[test]
     fn test_load_as_character() {
         let character1: char = 'a';
-        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&character1);
+        let encoded_as_i32: Vec<i32> =
+            ssvm_storage::store::serialize_unknown_to_vec_i32(&character1);
         println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
         let character2 = ssvm_storage::load::deserialize_vec_i32_to_char(encoded_as_i32);
         println!("Decoded as character: {:?}", character2);
@@ -391,21 +416,23 @@ mod tests {
         println!("Decoded as i64: {:?}", i642);
         assert_eq!(i642, 9223372036854775807);
     }
-    /*
     #[test]
-    fn xxxxxx() {
-        let num3: i64 = ssvm_storage::store::create_fixed_length_random_number(-100, 1).unwrap();
-        assert!(num3 > 0);
+    fn test_store_as_u8() {
+        let u81: u8 = 100;
+        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&u81);
+        println!("I64 - Encoded as Vec<i32>: {:?}", encoded_as_i32);
+        assert_eq!(u81, 100);
+        assert_eq!(ssvm_storage::store::type_of(u81), "u8");
+        assert_eq!(encoded_as_i32.len(), 1);
+        assert_eq!(encoded_as_i32[0], 100);
     }
     #[test]
-    fn xxxxxxx() {
-        let num4: i64 = ssvm_storage::store::create_fixed_length_random_number(1, 1000000000).unwrap();
-        assert!(num4 < 999999999);
+    fn test_load_as_u8() {
+        let u81: u8 = 100;
+        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&u81);
+        println!("I64 - Encoded as Vec<i32>: {:?}", encoded_as_i32);
+        let u82 = ssvm_storage::load::deserialize_vec_i32_to_u8(encoded_as_i32);
+        println!("Decoded as u8: {:?}", u82);
+        assert_eq!(u82, 100);
     }
-    #[test]
-    fn xxxxxxxx() {
-        let num5: i64 = ssvm_storage::store::create_unique_key().unwrap();
-        assert_eq!(19, num5.to_string().len());
-    }
-    */
 }
