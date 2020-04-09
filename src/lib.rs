@@ -36,15 +36,22 @@ mod ssvm_storage {
             let deserialized_to_unknown: T = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
             deserialized_to_unknown
         }
-
-        /*
+        pub fn deserialize_vec_i32_to_bool(_value: Vec<i32>) -> bool {
+            let deserialized_to_u8: Vec<u8> = s_d_u8_i32::deserialize_i32_to_u8(_value);
+            let deserialized_to_boolean: bool = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
+            deserialized_to_boolean
+        }
+/*
         pub fn load_as_bool(_i32_key: i32) -> bool {
+            let bool_vec: <i32> = Vec::new();
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
-                let fetched_i32_value: i32 = ssvm_native::ssvm_storage_loadI32();
+                bool_vec.push(ssvm_native::ssvm_storage_loadI32());
+                let boolean: bool = deserialize_vec_i32_to_bool(bool_vec);
                 ssvm_native::ssvm_storage_endLoadTx();
-                return fetched_i32_value;
+                return boolean;
             }
+
         }
         
         pub fn load_as_char(_i32_key: i32) -> char {
@@ -181,7 +188,7 @@ mod ssvm_storage {
 mod tests {
     use super::ssvm_storage;
     use serde::{Deserialize, Serialize};
-
+    // It is a requirement that the user calling the store and load implements the serde Default etc. as shown below.
     #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
     struct TestStruct {
         a_vec: Vec<u8>,
@@ -218,7 +225,15 @@ mod tests {
         assert_eq!(ssvm_storage::store::type_of(boolean1), "bool");
         assert_eq!(encoded_as_i32.len(), 1);
         assert_eq!(encoded_as_i32[0], 1);
-
+    }
+    #[test]
+    fn test_load_as_boolean() {
+        let boolean1: bool = true;
+        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&boolean1);
+        println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
+        let boolean2 = ssvm_storage::load::deserialize_vec_i32_to_bool(encoded_as_i32);
+        println!("Decoded as boolean: {:?}", boolean2);
+        assert_eq!(boolean2, true);
     }
 
     /*
