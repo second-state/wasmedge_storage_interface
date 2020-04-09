@@ -1,4 +1,4 @@
-//!
+//! How to use this crate
 //! # Adding this as a dependency
 //! ```
 //! [dependencies]
