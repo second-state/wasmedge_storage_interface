@@ -1,16 +1,16 @@
 //! How to use this crate
 //! # Adding this as a dependency
-//! ```
+//! ```rust, ignore
 //! [dependencies]
 //! rust_storage_interface_library = "^0.1"
 //! ```
 //!
 //! # Bringing this into scope
-//! ```
+//! ```rust, ignore
 //! use rust_storage_interface_library::ssvm_storage;
 //! ```
 //! # Tests
-//! ```
+//! ```bash, ignore
 //! cargo test --lib
 //! ```
 mod ssvm_storage {
@@ -231,14 +231,14 @@ mod ssvm_storage {
         }
         ///
         /// # Store String
-        /// ```
+        /// ```rust, ignore
         /// let my_string = String::from("A string to store");
         /// let storage_key: i32 = ssvm_storage::store::store(my_string);
         /// ```
 
         /// # Store Struct
         /// Please note, you must implement the serde features as show below. For example the Default feature is used when re-loading this data back from storage.
-        /// ```
+        /// ```rust, ignore
         /// #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
         ///     struct TestStruct {
         ///         a_vec: Vec<u8>,
