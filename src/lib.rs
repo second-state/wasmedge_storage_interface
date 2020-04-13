@@ -204,7 +204,21 @@ mod ssvm_storage {
                     let the_char: char = char::from_u32(u32_char).unwrap();
                     the_string.push(the_char);
                 }
+                ssvm_native::ssvm_storage_endLoadTx();
                 the_string
+            }
+        }
+        pub fn load_as_i32_vector(_i32_key: i32) -> Vec<i32> {
+            unsafe {
+                let mut i32_vector = Vec::new();
+                ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
+                let number_of_items: i32 = ssvm_native::ssvm_storage_loadI32();
+                for i in 0..number_of_items {
+                    let single_i32: i32 = ssvm_native::ssvm_storage_loadI32();
+                    i32_vector.push(single_i32);
+                }
+                ssvm_native::ssvm_storage_endLoadTx();
+                i32_vector
             }
         }
     }
@@ -265,6 +279,30 @@ mod ssvm_storage {
             // Add the data
             unsafe {
                 for i in encoded_as_i32.iter() {
+                    ssvm_native::ssvm_storage_storeI32(*i);
+                }
+            }
+            // End the store
+            unsafe {
+                ssvm_native::ssvm_storage_endStoreTx();
+            }
+            new_i32_key
+        }
+        /// This function does not use serde or bincode it just takes Vec<i32> and stores it natively
+        /// This is for developers who want to unpack their data ahead of time and make it directly available to the SSVM without conversion/serialization overheads at execution time
+        pub fn store_as_i32_vector(i32_vector: Vec<i32>) -> i32 {
+            // Begin store
+            let new_i32_key: i32 = utils::create_key_via_ssvm();
+            unsafe {
+                ssvm_native::ssvm_storage_beginStoreTx(new_i32_key);
+            }
+            // Add data length
+            unsafe {
+                ssvm_native::ssvm_storage_storeI32(i32_vector.len().try_into().unwrap());
+            }
+            // Add the data
+            unsafe {
+                for i in i32_vector.iter() {
                     ssvm_native::ssvm_storage_storeI32(*i);
                 }
             }
