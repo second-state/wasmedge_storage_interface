@@ -39,29 +39,27 @@ pub mod ssvm_storage {
 
     pub mod load {
         use super::ssvm_native;
-        use super::utils;
         use bincode;
-        use serde::{Deserialize, Serialize};
         use serialize_deserialize_u8_i32::s_d_u8_i32;
         use std::char;
 
         pub fn deserialize_vec_i32_to_unknown<'de, T: serde::de::DeserializeOwned>(
             _value: Vec<i32>,
-            t: T,
+            _t: T,
         ) -> T {
             let deserialized_to_u8: Vec<u8> = s_d_u8_i32::deserialize_i32_to_u8(_value);
             let deserialized_to_unknown: T = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
             deserialized_to_unknown
         }
-        pub fn load_as_struct<T: for<'de> serde::de::Deserialize<'de>>(_i32_key: i32, t: T) -> T {
+        pub fn load_as_struct<T: for<'de> serde::de::Deserialize<'de>>(_i32_key: i32, _t: T) -> T {
             let mut struct_vec = Vec::new();
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
                 let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
-                for i in 0..number_of_i32s {
+                for _i in 0..number_of_i32s {
                     struct_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
-                let the_struct: T = deserialize_vec_i32_to_unknown(struct_vec, t);
+                let the_struct: T = deserialize_vec_i32_to_unknown(struct_vec, _t);
                 ssvm_native::ssvm_storage_endLoadTx();
                 return the_struct;
             }
@@ -77,7 +75,7 @@ pub mod ssvm_storage {
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
                 let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
-                for i in 0..number_of_i32s {
+                for _i in 0..number_of_i32s {
                     bool_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
                 let boolean: bool = deserialize_vec_i32_to_bool(bool_vec);
@@ -95,7 +93,7 @@ pub mod ssvm_storage {
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
                 let number_of_chars: i32 = ssvm_native::ssvm_storage_loadI32();
-                for i in 0..number_of_chars {
+                for _i in 0..number_of_chars {
                     char_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
                 let character: char = deserialize_vec_i32_to_char(char_vec);
@@ -113,7 +111,7 @@ pub mod ssvm_storage {
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
                 let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
-                for i in 0..number_of_i32s {
+                for _i in 0..number_of_i32s {
                     i8_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
                 let i8_value: i8 = deserialize_vec_i32_to_i8(i8_vec);
@@ -131,7 +129,7 @@ pub mod ssvm_storage {
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
                 let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
-                for i in 0..number_of_i32s {
+                for _i in 0..number_of_i32s {
                     i16_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
                 let i16_value: i16 = deserialize_vec_i32_to_i16(i16_vec);
@@ -149,7 +147,7 @@ pub mod ssvm_storage {
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
                 let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
-                for i in 0..number_of_i32s {
+                for _i in 0..number_of_i32s {
                     i32_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
                 let i32_value: i32 = deserialize_vec_i32_to_i32(i32_vec);
@@ -167,7 +165,7 @@ pub mod ssvm_storage {
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
                 let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
-                for i in 0..number_of_i32s {
+                for _i in 0..number_of_i32s {
                     i64_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
                 let i64_value: i64 = deserialize_vec_i32_to_i64(i64_vec);
@@ -185,7 +183,7 @@ pub mod ssvm_storage {
             unsafe {
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
                 let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
-                for i in 0..number_of_i32s {
+                for _i in 0..number_of_i32s {
                     u8_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
                 let u8_value: u8 = deserialize_vec_i32_to_u8(u8_vec);
@@ -198,7 +196,7 @@ pub mod ssvm_storage {
                 let mut the_string = String::from("");
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
                 let number_of_chars: i32 = ssvm_native::ssvm_storage_loadI32();
-                for i in 0..number_of_chars {
+                for _i in 0..number_of_chars {
                     let i32_char_representation: i32 = ssvm_native::ssvm_storage_loadI32();
                     let u32_char: u32 = i32_char_representation as u32;
                     let the_char: char = char::from_u32(u32_char).unwrap();
@@ -213,7 +211,7 @@ pub mod ssvm_storage {
                 let mut i32_vector = Vec::new();
                 ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
                 let number_of_items: i32 = ssvm_native::ssvm_storage_loadI32();
-                for i in 0..number_of_items {
+                for _i in 0..number_of_items {
                     let single_i32: i32 = ssvm_native::ssvm_storage_loadI32();
                     i32_vector.push(single_i32);
                 }
@@ -227,7 +225,6 @@ pub mod ssvm_storage {
         use super::ssvm_native;
         use super::utils;
         use bincode;
-        use serde::{Deserialize, Serialize};
         use serialize_deserialize_u8_i32::s_d_u8_i32;
         use std::any::type_name;
         use std::convert::TryInto;
@@ -339,7 +336,7 @@ mod tests {
             a_u8: 4,
             a_bool: true,
         };
-        let encoded_as_i32: Vec<i32> =
+        let _encoded_as_i32: Vec<i32> =
             ssvm_storage::store::serialize_unknown_to_vec_i32(&test_struct1);
         println!("Encoded as Vec<i32>: {:?}", test_struct1);
         assert_eq!(
