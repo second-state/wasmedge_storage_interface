@@ -13,7 +13,7 @@
 //! ```bash, ignore
 //! cargo test --lib
 //! ```
-mod ssvm_storage {
+pub mod ssvm_storage {
 
     pub mod ssvm_native {
         extern "C" {
