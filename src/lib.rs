@@ -16,6 +16,7 @@
 pub mod ssvm_storage {
 
     pub mod ssvm_native {
+        #[link(wasm_import_module = "ssvm_native")]
         extern "C" {
             pub fn ssvm_storage_createUUID() -> i32;
             pub fn ssvm_storage_beginStoreTx(new_i32_key: i32);
