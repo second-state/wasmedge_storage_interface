@@ -24,7 +24,7 @@ pub mod ssvm_storage {
             pub fn ssvm_storage_createUUID(new_CString_key: *mut c_char);
             pub fn ssvm_storage_beginStoreTx(new_CString_key: *const c_char);
             pub fn ssvm_storage_beginLoadTx(new_CString_key: *const c_char);
-            pub fn ssvm_storage_storeI32(_i32_value: *const c_char);
+            pub fn ssvm_storage_storeI32(_i32_value: i32);
             pub fn ssvm_storage_loadI32() -> i32;
             pub fn ssvm_storage_endStoreTx();
             pub fn ssvm_storage_endLoadTx();
@@ -36,6 +36,7 @@ pub mod ssvm_storage {
         use bincode;
         use serialize_deserialize_u8_i32::s_d_u8_i32;
         use std::char;
+        use std::ffi::CString;
 
         pub fn deserialize_vec_i32_to_unknown<'de, T: serde::de::DeserializeOwned>(
             _value: Vec<i32>,
@@ -45,7 +46,10 @@ pub mod ssvm_storage {
             let deserialized_to_unknown: T = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
             deserialized_to_unknown
         }
-        pub fn load_as_struct<T: for<'de> serde::de::Deserialize<'de>>(_string_key: &str, _t: T) -> T {
+        pub fn load_as_struct<T: for<'de> serde::de::Deserialize<'de>>(
+            _string_key: &str,
+            _t: T,
+        ) -> T {
             let mut struct_vec = Vec::new();
             // Update - start (key as string)
             let var_c_string = CString::new(_string_key).expect("CString::new failed");
@@ -311,7 +315,7 @@ pub mod ssvm_storage {
         use serialize_deserialize_u8_i32::s_d_u8_i32;
         use std::any::type_name;
         use std::convert::TryInto;
-        use std::ffi::{CString};
+        use std::ffi::CString;
 
         pub fn type_of<T>(_: T) -> &'static str {
             type_name::<T>()
@@ -348,29 +352,21 @@ pub mod ssvm_storage {
             // Encode
             let encoded_as_i32: Vec<i32> = serialize_unknown_to_vec_i32(&v);
             // Create key as CString data type
-            let var_c_string = CString::new("placeholder").expect("Error: The CString::new constructor has failed");
+            let var_c_string = CString::new("placeholder")
+                .expect("Error: The CString::new constructor has failed");
             // Convert the key to a pointer which can be modified by external C++ code (requires into_raw() as apposed to as_ptr())
             let ptr_c_string = var_c_string.into_raw();
             // Call the createUUID extern C function which allows SSVM to modify the CString's (pointer's) contents
-            unsafe {
-                ssvm_native::ssvm_storage_createUUID(ptr_c_string)
-            }
+            unsafe { ssvm_native::ssvm_storage_createUUID(ptr_c_string) }
             // Take ownership of the CString pointer back
-            let var_c_string_2 = unsafe { 
-                CString::from_raw(ptr_c_string) 
-            };
+            let var_c_string_2 = unsafe { CString::from_raw(ptr_c_string) };
             // Create another pointer variable to CString
             let ptr_c_string_2 = var_c_string_2.into_raw();
             // Call the beginStoreTx function using the newest pointer
             unsafe {
                 ssvm_native::ssvm_storage_beginStoreTx(ptr_c_string_2);
             }
-            // Retakes ownership of the newest pointer
-            let _var_c_string_3 = unsafe {
-                CString::from_raw(ptr_c_string_2);
-            };
-            // Create a string of the key so that it can be returned to the caller
-            let var_string = String::from(_var_c_string_3.into_string().expect("into_string() call failed"));
+            let var_c_string_3: CString = unsafe { CString::from_raw(ptr_c_string_2) };
             // Add data length
             unsafe {
                 ssvm_native::ssvm_storage_storeI32(encoded_as_i32.len().try_into().unwrap());
@@ -385,24 +381,21 @@ pub mod ssvm_storage {
             unsafe {
                 ssvm_native::ssvm_storage_endStoreTx();
             }
-            var_string
+            var_c_string_3.to_str().unwrap().to_string()
         }
         /// This function does not use serde or bincode it just takes Vec<i32> and stores it natively
         /// This is for developers who want to unpack their data ahead of time and make it directly available to the SSVM without conversion/serialization overheads at execution time
         pub fn store_as_i32_vector(i32_vector: Vec<i32>) -> String {
             // Create key as CString data type
             // Create key as CString data type
-            let var_c_string = CString::new("placeholder").expect("Error: The CString::new constructor has failed");
+            let var_c_string = CString::new("placeholder")
+                .expect("Error: The CString::new constructor has failed");
             // Convert the key to a pointer which can be modified by external C++ code (requires into_raw() as apposed to as_ptr())
             let ptr_c_string = var_c_string.into_raw();
             // Call the createUUID extern C function which allows SSVM to modify the CString's (pointer's) contents
-            unsafe {
-                ssvm_native::ssvm_storage_createUUID(ptr_c_string)
-            }
+            unsafe { ssvm_native::ssvm_storage_createUUID(ptr_c_string) }
             // Take ownership of the CString pointer back
-            let var_c_string_2 = unsafe { 
-                CString::from_raw(ptr_c_string) 
-            };
+            let var_c_string_2 = unsafe { CString::from_raw(ptr_c_string) };
             // Create another pointer variable to CString
             let ptr_c_string_2 = var_c_string_2.into_raw();
             // Call the beginStoreTx function using the newest pointer
@@ -410,12 +403,8 @@ pub mod ssvm_storage {
                 ssvm_native::ssvm_storage_beginStoreTx(ptr_c_string_2);
             }
             // Retakes ownership of the newest pointer
-            let _var_c_string_3 = unsafe {
-                CString::from_raw(ptr_c_string_2);
-            };
-            // Create a string of the key so that it can be returned to the caller
-            let var_string = String::from(_var_c_string_3.into_string().expect("into_string() call failed"));
-            // Add data length
+            let var_c_string_3: CString = unsafe { CString::from_raw(ptr_c_string_2) };
+            // store
             unsafe {
                 ssvm_native::ssvm_storage_storeI32(i32_vector.len().try_into().unwrap());
             }
@@ -429,7 +418,7 @@ pub mod ssvm_storage {
             unsafe {
                 ssvm_native::ssvm_storage_endStoreTx();
             }
-            var_string
+            var_c_string_3.to_str().unwrap().to_string()
         }
     }
 }
