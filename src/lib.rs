@@ -13,12 +13,12 @@
 //! ```bash, ignore
 //! cargo test --lib
 //! ```
-use std::ffi::{CStr, CString};
-use std::os::raw::c_char;
 
 pub mod ssvm_storage {
 
     pub mod ssvm_native {
+        use std::os::raw::c_char;
+
         #[link(wasm_import_module = "ssvm_native")]
         extern "C" {
             pub fn ssvm_storage_createUUID(new_CString_key: *mut c_char);
@@ -221,6 +221,7 @@ pub mod ssvm_storage {
         use serialize_deserialize_u8_i32::s_d_u8_i32;
         use std::any::type_name;
         use std::convert::TryInto;
+        use std::ffi::{CString};
 
         pub fn type_of<T>(_: T) -> &'static str {
             type_name::<T>()
@@ -251,7 +252,7 @@ pub mod ssvm_storage {
         ///         a_bool: bool,
         ///     }
         /// ```
-        pub fn store<V: std::clone::Clone + serde::ser::Serialize>(v: V) -> i32 {
+        pub fn store<V: std::clone::Clone + serde::ser::Serialize>(v: V) -> String {
             let type_of_value = type_of(v.clone());
             println!("{:?}", type_of_value);
             // Encode
@@ -278,6 +279,8 @@ pub mod ssvm_storage {
             let _var_c_string_3 = unsafe {
                 CString::from_raw(ptr_c_string_2);
             };
+            // Create a string of the key so that it can be returned to the caller
+            let var_string = String::from(_var_c_string_3.into_string().expect("into_string() call failed"));
             // Add data length
             unsafe {
                 ssvm_native::ssvm_storage_storeI32(encoded_as_i32.len().try_into().unwrap());
@@ -292,11 +295,11 @@ pub mod ssvm_storage {
             unsafe {
                 ssvm_native::ssvm_storage_endStoreTx();
             }
-            new_CStr_key
+            var_string
         }
         /// This function does not use serde or bincode it just takes Vec<i32> and stores it natively
         /// This is for developers who want to unpack their data ahead of time and make it directly available to the SSVM without conversion/serialization overheads at execution time
-        pub fn store_as_i32_vector(i32_vector: Vec<i32>) -> i32 {
+        pub fn store_as_i32_vector(i32_vector: Vec<i32>) -> String {
             // Create key as CString data type
             // Create key as CString data type
             let var_c_string = CString::new("placeholder").expect("Error: The CString::new constructor has failed");
@@ -320,6 +323,8 @@ pub mod ssvm_storage {
             let _var_c_string_3 = unsafe {
                 CString::from_raw(ptr_c_string_2);
             };
+            // Create a string of the key so that it can be returned to the caller
+            let var_string = String::from(_var_c_string_3.into_string().expect("into_string() call failed"));
             // Add data length
             unsafe {
                 ssvm_native::ssvm_storage_storeI32(i32_vector.len().try_into().unwrap());
@@ -334,7 +339,7 @@ pub mod ssvm_storage {
             unsafe {
                 ssvm_native::ssvm_storage_endStoreTx();
             }
-            new_CStr_key
+            var_string
         }
     }
 }
