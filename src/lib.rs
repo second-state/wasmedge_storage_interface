@@ -275,7 +275,7 @@ pub mod ssvm_storage {
                 ssvm_native::ssvm_storage_beginStoreTx(ptr_c_string_2);
             }
             // Retakes ownership of the newest pointer
-            let var_c_string_3 = unsafe {
+            let _var_c_string_3 = unsafe {
                 CString::from_raw(ptr_c_string_2);
             };
             // Add data length
@@ -317,7 +317,7 @@ pub mod ssvm_storage {
                 ssvm_native::ssvm_storage_beginStoreTx(ptr_c_string_2);
             }
             // Retakes ownership of the newest pointer
-            let var_c_string_3 = unsafe {
+            let _var_c_string_3 = unsafe {
                 CString::from_raw(ptr_c_string_2);
             };
             // Add data length
