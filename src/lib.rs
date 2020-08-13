@@ -19,6 +19,7 @@ use std::os::raw::c_char;
 pub mod ssvm_storage {
 
     pub mod ssvm_native {
+        #[link(wasm_import_module = "ssvm_native")]
         extern "C" {
             pub fn ssvm_storage_createUUID(new_CString_key: *mut c_char);
             pub fn ssvm_storage_beginStoreTx(new_CString_key: *const c_char);
