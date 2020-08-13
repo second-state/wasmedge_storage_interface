@@ -277,7 +277,7 @@ pub mod ssvm_storage {
             // Retakes ownership of the newest pointer
             let var_c_string_3 = unsafe {
                 CString::from_raw(ptr_c_string_2);
-            }
+            };
             // Add data length
             unsafe {
                 ssvm_native::ssvm_storage_storeI32(encoded_as_i32.len().try_into().unwrap());
@@ -319,7 +319,7 @@ pub mod ssvm_storage {
             // Retakes ownership of the newest pointer
             let var_c_string_3 = unsafe {
                 CString::from_raw(ptr_c_string_2);
-            }
+            };
             // Add data length
             unsafe {
                 ssvm_native::ssvm_storage_storeI32(i32_vector.len().try_into().unwrap());
