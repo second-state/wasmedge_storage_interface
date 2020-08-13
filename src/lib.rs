@@ -45,16 +45,25 @@ pub mod ssvm_storage {
             let deserialized_to_unknown: T = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
             deserialized_to_unknown
         }
-        pub fn load_as_struct<T: for<'de> serde::de::Deserialize<'de>>(_i32_key: i32, _t: T) -> T {
+        pub fn load_as_struct<T: for<'de> serde::de::Deserialize<'de>>(_string_key: &str, _t: T) -> T {
             let mut struct_vec = Vec::new();
+            // Update - start (key as string)
+            let var_c_string = CString::new(_string_key).expect("CString::new failed");
+            let ptr_c_string = var_c_string.into_raw();
+            // Update - end
             unsafe {
-                ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
+                // Update - start (key as string)
+                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                // Update - end
                 let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
                 for _i in 0..number_of_i32s {
                     struct_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
                 let the_struct: T = deserialize_vec_i32_to_unknown(struct_vec, _t);
                 ssvm_native::ssvm_storage_endLoadTx();
+                // Update - start (key as string)
+                let var_pointer_released = CString::from_raw(ptr_c_string);
+                // Update - end
                 return the_struct;
             }
         }
@@ -64,16 +73,25 @@ pub mod ssvm_storage {
                 bincode::deserialize(&deserialized_to_u8[..]).unwrap();
             deserialized_to_boolean
         }
-        pub fn load_as_bool(_i32_key: i32) -> bool {
+        pub fn load_as_bool(_string_key: &str) -> bool {
             let mut bool_vec = Vec::new();
+            // Update - start (key as string)
+            let var_c_string = CString::new(_string_key).expect("CString::new failed");
+            let ptr_c_string = var_c_string.into_raw();
+            // Update - end
             unsafe {
-                ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
+                // Update - start (key as string)
+                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                // Update - end
                 let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
                 for _i in 0..number_of_i32s {
                     bool_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
                 let boolean: bool = deserialize_vec_i32_to_bool(bool_vec);
                 ssvm_native::ssvm_storage_endLoadTx();
+                // Update - start (key as string)
+                let var_pointer_released = CString::from_raw(ptr_c_string);
+                // Update - end
                 return boolean;
             }
         }
@@ -82,16 +100,25 @@ pub mod ssvm_storage {
             let deserialized_to_char: char = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
             deserialized_to_char
         }
-        pub fn load_as_char(_i32_key: i32) -> char {
+        pub fn load_as_char(_string_key: &str) -> char {
             let mut char_vec = Vec::new();
+            // Update - start (key as string)
+            let var_c_string = CString::new(_string_key).expect("CString::new failed");
+            let ptr_c_string = var_c_string.into_raw();
+            // Update - end
             unsafe {
-                ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
+                // Update - start (key as string)
+                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                // Update - end
                 let number_of_chars: i32 = ssvm_native::ssvm_storage_loadI32();
                 for _i in 0..number_of_chars {
                     char_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
                 let character: char = deserialize_vec_i32_to_char(char_vec);
                 ssvm_native::ssvm_storage_endLoadTx();
+                // Update - start (key as string)
+                let var_pointer_released = CString::from_raw(ptr_c_string);
+                // Update - end
                 return character;
             }
         }
@@ -100,16 +127,25 @@ pub mod ssvm_storage {
             let deserialized_to_i8: i8 = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
             deserialized_to_i8
         }
-        pub fn load_as_i8(_i32_key: i32) -> i8 {
+        pub fn load_as_i8(_string_key: &str) -> i8 {
             let mut i8_vec = Vec::new();
+            // Update - start (key as string)
+            let var_c_string = CString::new(_string_key).expect("CString::new failed");
+            let ptr_c_string = var_c_string.into_raw();
+            // Update - end
             unsafe {
-                ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
+                // Update - start (key as string)
+                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                // Update - end
                 let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
                 for _i in 0..number_of_i32s {
                     i8_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
                 let i8_value: i8 = deserialize_vec_i32_to_i8(i8_vec);
                 ssvm_native::ssvm_storage_endLoadTx();
+                // Update - start (key as string)
+                let var_pointer_released = CString::from_raw(ptr_c_string);
+                // Update - end
                 return i8_value;
             }
         }
@@ -118,16 +154,25 @@ pub mod ssvm_storage {
             let deserialized_to_i16: i16 = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
             deserialized_to_i16
         }
-        pub fn load_as_i16(_i32_key: i32) -> i16 {
+        pub fn load_as_i16(_string_key: &str) -> i16 {
             let mut i16_vec = Vec::new();
+            // Update - start (key as string)
+            let var_c_string = CString::new(_string_key).expect("CString::new failed");
+            let ptr_c_string = var_c_string.into_raw();
+            // Update - end
             unsafe {
-                ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
+                // Update - start (key as string)
+                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                // Update - end
                 let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
                 for _i in 0..number_of_i32s {
                     i16_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
                 let i16_value: i16 = deserialize_vec_i32_to_i16(i16_vec);
                 ssvm_native::ssvm_storage_endLoadTx();
+                // Update - start (key as string)
+                let var_pointer_released = CString::from_raw(ptr_c_string);
+                // Update - end
                 return i16_value;
             }
         }
@@ -136,16 +181,25 @@ pub mod ssvm_storage {
             let deserialized_to_i32: i32 = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
             deserialized_to_i32
         }
-        pub fn load_as_i32(_i32_key: i32) -> i32 {
+        pub fn load_as_i32(_string_key: &str) -> i32 {
             let mut i32_vec = Vec::new();
+            // Update - start (key as string)
+            let var_c_string = CString::new(_string_key).expect("CString::new failed");
+            let ptr_c_string = var_c_string.into_raw();
+            // Update - end
             unsafe {
-                ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
+                // Update - start (key as string)
+                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                // Update - end
                 let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
                 for _i in 0..number_of_i32s {
                     i32_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
                 let i32_value: i32 = deserialize_vec_i32_to_i32(i32_vec);
                 ssvm_native::ssvm_storage_endLoadTx();
+                // Update - start (key as string)
+                let var_pointer_released = CString::from_raw(ptr_c_string);
+                // Update - end
                 return i32_value;
             }
         }
@@ -154,16 +208,25 @@ pub mod ssvm_storage {
             let deserialized_to_i64: i64 = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
             deserialized_to_i64
         }
-        pub fn load_as_i64(_i32_key: i32) -> i64 {
+        pub fn load_as_i64(_string_key: &str) -> i64 {
             let mut i64_vec = Vec::new();
+            // Update - start (key as string)
+            let var_c_string = CString::new(_string_key).expect("CString::new failed");
+            let ptr_c_string = var_c_string.into_raw();
+            // Update - end
             unsafe {
-                ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
+                // Update - start (key as string)
+                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                // Update - end
                 let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
                 for _i in 0..number_of_i32s {
                     i64_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
                 let i64_value: i64 = deserialize_vec_i32_to_i64(i64_vec);
                 ssvm_native::ssvm_storage_endLoadTx();
+                // Update - start (key as string)
+                let var_pointer_released = CString::from_raw(ptr_c_string);
+                // Update - end
                 return i64_value;
             }
         }
@@ -172,23 +235,38 @@ pub mod ssvm_storage {
             let deserialized_to_u8: u8 = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
             deserialized_to_u8
         }
-        pub fn load_as_u8(_i32_key: i32) -> u8 {
+        pub fn load_as_u8(_string_key: &str) -> u8 {
             let mut u8_vec = Vec::new();
+            // Update - start (key as string)
+            let var_c_string = CString::new(_string_key).expect("CString::new failed");
+            let ptr_c_string = var_c_string.into_raw();
+            // Update - end
             unsafe {
-                ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
+                // Update - start (key as string)
+                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                // Update - end
                 let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
                 for _i in 0..number_of_i32s {
                     u8_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
                 let u8_value: u8 = deserialize_vec_i32_to_u8(u8_vec);
                 ssvm_native::ssvm_storage_endLoadTx();
+                // Update - start (key as string)
+                let var_pointer_released = CString::from_raw(ptr_c_string);
+                // Update - end
                 return u8_value;
             }
         }
-        pub fn load_as_string(_i32_key: i32) -> String {
+        pub fn load_as_string(_string_key: &str) -> String {
+            // Update - start (key as string)
+            let var_c_string = CString::new(_string_key).expect("CString::new failed");
+            let ptr_c_string = var_c_string.into_raw();
+            // Update - end
             unsafe {
                 let mut the_string = String::from("");
-                ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
+                // Update - start (key as string)
+                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                // Update - end
                 let number_of_chars: i32 = ssvm_native::ssvm_storage_loadI32();
                 for _i in 0..number_of_chars {
                     let i32_char_representation: i32 = ssvm_native::ssvm_storage_loadI32();
@@ -197,19 +275,31 @@ pub mod ssvm_storage {
                     the_string.push(the_char);
                 }
                 ssvm_native::ssvm_storage_endLoadTx();
+                // Update - start (key as string)
+                let var_pointer_released = CString::from_raw(ptr_c_string);
+                // Update - end
                 the_string
             }
         }
-        pub fn load_as_i32_vector(_i32_key: i32) -> Vec<i32> {
+        pub fn load_as_i32_vector(_string_key: &str) -> Vec<i32> {
+            // Update - start (key as string)
+            let var_c_string = CString::new(_string_key).expect("CString::new failed");
+            let ptr_c_string = var_c_string.into_raw();
+            // Update - end
             unsafe {
                 let mut i32_vector = Vec::new();
-                ssvm_native::ssvm_storage_beginLoadTx(_i32_key);
+                // Update - start (key as string)
+                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                // Update - end
                 let number_of_items: i32 = ssvm_native::ssvm_storage_loadI32();
                 for _i in 0..number_of_items {
                     let single_i32: i32 = ssvm_native::ssvm_storage_loadI32();
                     i32_vector.push(single_i32);
                 }
                 ssvm_native::ssvm_storage_endLoadTx();
+                // Update - start (key as string)
+                let var_pointer_released = CString::from_raw(ptr_c_string);
+                // Update - end
                 i32_vector
             }
         }
