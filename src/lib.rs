@@ -282,6 +282,7 @@ pub mod ssvm_storage {
                 for _i in 0..number_of_i32s {
                     retrieved_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
+                println!{"Deserialize i32 Vec: {:?}", retrieved_vec};
                 // Convert that i32 vector, back into the original u8 vector
                 let the_string = deserialize_vec_i32_to_string(retrieved_vec);
                 // End load
@@ -354,8 +355,8 @@ pub mod ssvm_storage {
         ///     }
         /// ```
         pub fn store<V: std::clone::Clone + serde::ser::Serialize>(v: V) -> String {
-            let type_of_value = type_of(v.clone());
-            println!("{:?}", type_of_value);
+            //let type_of_value = type_of(v.clone());
+            //println!("{:?}", type_of_value);
             // Encode
             let encoded_as_i32: Vec<i32> = serialize_unknown_to_vec_i32(&v);
             // Create key as CString data type
