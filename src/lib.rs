@@ -37,6 +37,7 @@ pub mod ssvm_storage {
         use serialize_deserialize_u8_i32::s_d_u8_i32;
         use std::char;
         use std::ffi::CString;
+        use std::str;
 
         pub fn deserialize_vec_i32_to_unknown<'de, T: serde::de::DeserializeOwned>(
             _value: Vec<i32>,
@@ -261,23 +262,29 @@ pub mod ssvm_storage {
                 return u8_value;
             }
         }
+        pub fn deserialize_vec_i32_to_string(_value: Vec<i32>) -> String{
+            let deserialized_to_u8: Vec<u8> = s_d_u8_i32::deserialize_i32_to_u8(_value);
+            let deserialized_to_string: String = bincode::deserialize(&deserialized_to_u8[..]).unwrap();
+            deserialized_to_string
+        }
         pub fn load_as_string(_string_key: &str) -> String {
+            let mut retrieved_vec = Vec::new();
             // Update - start (key as string)
             let var_c_string = CString::new(_string_key).expect("CString::new failed");
             let ptr_c_string = var_c_string.into_raw();
             // Update - end
             unsafe {
-                let mut the_string = String::from("");
                 // Update - start (key as string)
                 ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
                 // Update - end
-                let number_of_chars: i32 = ssvm_native::ssvm_storage_loadI32();
-                for _i in 0..number_of_chars {
-                    let i32_char_representation: i32 = ssvm_native::ssvm_storage_loadI32();
-                    let u32_char: u32 = i32_char_representation as u32;
-                    let the_char: char = char::from_u32(u32_char).unwrap();
-                    the_string.push(the_char);
+                let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
+                // Get all i32s and save them to a vector
+                for _i in 0..number_of_i32s {
+                    retrieved_vec.push(ssvm_native::ssvm_storage_loadI32());
                 }
+                // Convert that i32 vector, back into the original u8 vector
+                let the_string = deserialize_vec_i32_to_string(retrieved_vec);
+                // End load
                 ssvm_native::ssvm_storage_endLoadTx();
                 // Update - start (key as string)
                 let var_pointer_released = CString::from_raw(ptr_c_string);
@@ -359,7 +366,7 @@ pub mod ssvm_storage {
             // Call the createUUID extern C function which allows SSVM to modify the CString's (pointer's) contents
             unsafe { ssvm_native::ssvm_storage_createUUID(ptr_c_string) }
             // Take ownership of the CString pointer back
-            let var_c_string_2 = unsafe { CString::from_raw(ptr_c_string) };
+            let var_c_string_2: CString= unsafe { CString::from_raw(ptr_c_string) };
             // Create another pointer variable to CString
             let ptr_c_string_2 = var_c_string_2.into_raw();
             // Call the beginStoreTx function using the newest pointer
@@ -395,7 +402,7 @@ pub mod ssvm_storage {
             // Call the createUUID extern C function which allows SSVM to modify the CString's (pointer's) contents
             unsafe { ssvm_native::ssvm_storage_createUUID(ptr_c_string) }
             // Take ownership of the CString pointer back
-            let var_c_string_2 = unsafe { CString::from_raw(ptr_c_string) };
+            let var_c_string_2: CString = unsafe { CString::from_raw(ptr_c_string) };
             // Create another pointer variable to CString
             let ptr_c_string_2 = var_c_string_2.into_raw();
             // Call the beginStoreTx function using the newest pointer
