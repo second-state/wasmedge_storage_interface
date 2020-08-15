@@ -333,7 +333,9 @@ pub mod ssvm_storage {
             v: V,
         ) -> Vec<i32> {
             let encoded_as_u8: Vec<u8> = bincode::serialize(&v).unwrap();
+            println!("Store - orig data is now encoded to u8: {:?}", encoded_as_u8);
             let encoded_as_i32: Vec<i32> = s_d_u8_i32::serialize_u8_to_i32(encoded_as_u8);
+            println!("Store - u8 data is now encoded to i32: {:?}", encoded_as_i32);
             encoded_as_i32
         }
         ///
