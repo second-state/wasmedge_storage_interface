@@ -393,18 +393,28 @@ pub mod ssvm_storage {
             }
             var_c_string_3.to_str().unwrap().to_string()
         }
-        /// This function does not use serde or bincode it just takes Vec<i32> and stores it natively
+
+       /// This function does not use serde or bincode it just takes Vec<i32> and stores it natively
         /// This is for developers who want to unpack their data ahead of time and make it directly available to the SSVM without conversion/serialization overheads at execution time
-        pub fn update_as_i32_vector(_string_key: &str, i32_vector: Vec<i32>){
-            // Create CString out of the string key 
-            let var_c_string = CString::new(_string_key).expect("CString::new failed");
-            // Create a pointer out of the CString
+        pub fn store_as_i32_vector(i32_vector: Vec<i32>) -> String {
+            // Create key as CString data type
+            // Create key as CString data type
+            let var_c_string = CString::new("placeholder")
+                .expect("Error: The CString::new constructor has failed");
+            // Convert the key to a pointer which can be modified by external C++ code (requires into_raw() as apposed to as_ptr())
             let ptr_c_string = var_c_string.into_raw();
-            // Just go ahead and use the existing pointer, no need to create uuid here because we already have it pased in
-            unsafe {
-                ssvm_native::ssvm_storage_beginStoreTx(ptr_c_string);
-            }
+            // Call the createUUID extern C function which allows SSVM to modify the CString's (pointer's) contents
+            unsafe { ssvm_native::ssvm_storage_createUUID(ptr_c_string) }
+            // Take ownership of the CString pointer back
             let var_c_string_2: CString = unsafe { CString::from_raw(ptr_c_string) };
+            // Create another pointer variable to CString
+            let ptr_c_string_2 = var_c_string_2.into_raw();
+            // Call the beginStoreTx function using the newest pointer
+            unsafe {
+                ssvm_native::ssvm_storage_beginStoreTx(ptr_c_string_2);
+            }
+            // Retakes ownership of the newest pointer
+            let var_c_string_3: CString = unsafe { CString::from_raw(ptr_c_string_2) };
             // store
             unsafe {
                 ssvm_native::ssvm_storage_storeI32(i32_vector.len().try_into().unwrap());
@@ -419,6 +429,7 @@ pub mod ssvm_storage {
             unsafe {
                 ssvm_native::ssvm_storage_endStoreTx();
             }
+            var_c_string_3.to_str().unwrap().to_string()
         }
 
         pub fn update<V: std::clone::Clone + serde::ser::Serialize>(_string_key: &str, v: V){
@@ -440,6 +451,34 @@ pub mod ssvm_storage {
             // Add the data
             unsafe {
                 for i in encoded_as_i32.iter() {
+                    ssvm_native::ssvm_storage_storeI32(*i);
+                }
+            }
+            // End the store
+            unsafe {
+                ssvm_native::ssvm_storage_endStoreTx();
+            }
+        }
+
+        /// This function does not use serde or bincode it just takes Vec<i32> and stores it natively
+        /// This is for developers who want to unpack their data ahead of time and make it directly available to the SSVM without conversion/serialization overheads at execution time
+        pub fn update_as_i32_vector(_string_key: &str, i32_vector: Vec<i32>){
+            // Create CString out of the string key 
+            let var_c_string = CString::new(_string_key).expect("CString::new failed");
+            // Create a pointer out of the CString
+            let ptr_c_string = var_c_string.into_raw();
+            // Just go ahead and use the existing pointer, no need to create uuid here because we already have it pased in
+            unsafe {
+                ssvm_native::ssvm_storage_beginStoreTx(ptr_c_string);
+            }
+            let var_c_string_2: CString = unsafe { CString::from_raw(ptr_c_string) };
+            // store
+            unsafe {
+                ssvm_native::ssvm_storage_storeI32(i32_vector.len().try_into().unwrap());
+            }
+            // Add the data
+            unsafe {
+                for i in i32_vector.iter() {
                     ssvm_native::ssvm_storage_storeI32(*i);
                 }
             }
