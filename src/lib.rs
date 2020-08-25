@@ -362,8 +362,7 @@ pub mod ssvm_storage {
             // Encode
             let encoded_as_i32: Vec<i32> = serialize_unknown_to_vec_i32(&v);
             // Create key as CString data type
-            let var_c_string = CString::new("placeholder")
-                .expect("Error: The CString::new constructor has failed");
+            let var_c_string = CString::new("placeholder-32bytes-aaaaaaaaaaaa").expect("Error: The CString::new constructor has failed");
             // Convert the key to a pointer which can be modified by external C++ code (requires into_raw() as apposed to as_ptr())
             let ptr_c_string = var_c_string.into_raw();
             // Call the createUUID extern C function which allows SSVM to modify the CString's (pointer's) contents
