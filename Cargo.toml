@@ -2,7 +2,7 @@
 name = "ssvm_storage_interface"
 version = "0.1.29"
 authors = ["tpmccallum <mistermac2008@gmail.com>"]
-edition = "2020"
+edition = "2018"
 readme = "README.md"
 repository = "https://github.com/second-state/ssvm_storage_interface"
 license-file = "LICENSE"
