@@ -10,4 +10,4 @@ Please see the [official specification for this storage interface](https://githu
 
 # Crates.io
 
-The official crate is available at [crates.io](https://crates.io/crates/rust_storage_interface_library)
+The official crate is available at [crates.io](https://crates.io/crates/ssvm_storage_interface)
