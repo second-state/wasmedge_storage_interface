@@ -7,32 +7,32 @@
 //!
 //! # Bringing this into scope
 //! ```rust, ignore
-//! use rust_storage_interface_library::ssvm_storage;
+//! use rust_storage_interface_library::wasmedge_storage;
 //! ```
 //! # Tests
 //! ```bash, ignore
 //! cargo test --lib
 //! ```
 
-pub mod ssvm_storage {
+pub mod wasmedge_storage {
 
-    pub mod ssvm_native {
+    pub mod wasmedge_native {
         use std::os::raw::c_char;
 
-        #[link(wasm_import_module = "ssvm_native")]
+        #[link(wasm_import_module = "wasmedge_native")]
         extern "C" {
-            pub fn ssvm_storage_createUUID(new_CString_key: *mut c_char);
-            pub fn ssvm_storage_beginStoreTx(new_CString_key: *const c_char);
-            pub fn ssvm_storage_beginLoadTx(new_CString_key: *const c_char);
-            pub fn ssvm_storage_storeI32(_i32_value: i32);
-            pub fn ssvm_storage_loadI32() -> i32;
-            pub fn ssvm_storage_endStoreTx();
-            pub fn ssvm_storage_endLoadTx();
+            pub fn wasmedge_storage_createUUID(new_CString_key: *mut c_char);
+            pub fn wasmedge_storage_beginStoreTx(new_CString_key: *const c_char);
+            pub fn wasmedge_storage_beginLoadTx(new_CString_key: *const c_char);
+            pub fn wasmedge_storage_storeI32(_i32_value: i32);
+            pub fn wasmedge_storage_loadI32() -> i32;
+            pub fn wasmedge_storage_endStoreTx();
+            pub fn wasmedge_storage_endLoadTx();
         }
     }
 
     pub mod load {
-        use super::ssvm_native;
+        use super::wasmedge_native;
         use bincode;
         use serialize_deserialize_u8_i32::s_d_u8_i32;
         use std::char;
@@ -58,14 +58,14 @@ pub mod ssvm_storage {
             // Update - end
             unsafe {
                 // Update - start (key as string)
-                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                wasmedge_native::wasmedge_storage_beginLoadTx(ptr_c_string);
                 // Update - end
-                let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
+                let number_of_i32s: i32 = wasmedge_native::wasmedge_storage_loadI32();
                 for _i in 0..number_of_i32s {
-                    struct_vec.push(ssvm_native::ssvm_storage_loadI32());
+                    struct_vec.push(wasmedge_native::wasmedge_storage_loadI32());
                 }
                 let the_struct: T = deserialize_vec_i32_to_unknown(struct_vec, _t);
-                ssvm_native::ssvm_storage_endLoadTx();
+                wasmedge_native::wasmedge_storage_endLoadTx();
                 // Update - start (key as string)
                 let var_pointer_released = CString::from_raw(ptr_c_string);
                 // Update - end
@@ -86,14 +86,14 @@ pub mod ssvm_storage {
             // Update - end
             unsafe {
                 // Update - start (key as string)
-                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                wasmedge_native::wasmedge_storage_beginLoadTx(ptr_c_string);
                 // Update - end
-                let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
+                let number_of_i32s: i32 = wasmedge_native::wasmedge_storage_loadI32();
                 for _i in 0..number_of_i32s {
-                    bool_vec.push(ssvm_native::ssvm_storage_loadI32());
+                    bool_vec.push(wasmedge_native::wasmedge_storage_loadI32());
                 }
                 let boolean: bool = deserialize_vec_i32_to_bool(bool_vec);
-                ssvm_native::ssvm_storage_endLoadTx();
+                wasmedge_native::wasmedge_storage_endLoadTx();
                 // Update - start (key as string)
                 let var_pointer_released = CString::from_raw(ptr_c_string);
                 // Update - end
@@ -113,14 +113,14 @@ pub mod ssvm_storage {
             // Update - end
             unsafe {
                 // Update - start (key as string)
-                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                wasmedge_native::wasmedge_storage_beginLoadTx(ptr_c_string);
                 // Update - end
-                let number_of_chars: i32 = ssvm_native::ssvm_storage_loadI32();
+                let number_of_chars: i32 = wasmedge_native::wasmedge_storage_loadI32();
                 for _i in 0..number_of_chars {
-                    char_vec.push(ssvm_native::ssvm_storage_loadI32());
+                    char_vec.push(wasmedge_native::wasmedge_storage_loadI32());
                 }
                 let character: char = deserialize_vec_i32_to_char(char_vec);
-                ssvm_native::ssvm_storage_endLoadTx();
+                wasmedge_native::wasmedge_storage_endLoadTx();
                 // Update - start (key as string)
                 let var_pointer_released = CString::from_raw(ptr_c_string);
                 // Update - end
@@ -140,14 +140,14 @@ pub mod ssvm_storage {
             // Update - end
             unsafe {
                 // Update - start (key as string)
-                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                wasmedge_native::wasmedge_storage_beginLoadTx(ptr_c_string);
                 // Update - end
-                let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
+                let number_of_i32s: i32 = wasmedge_native::wasmedge_storage_loadI32();
                 for _i in 0..number_of_i32s {
-                    i8_vec.push(ssvm_native::ssvm_storage_loadI32());
+                    i8_vec.push(wasmedge_native::wasmedge_storage_loadI32());
                 }
                 let i8_value: i8 = deserialize_vec_i32_to_i8(i8_vec);
-                ssvm_native::ssvm_storage_endLoadTx();
+                wasmedge_native::wasmedge_storage_endLoadTx();
                 // Update - start (key as string)
                 let var_pointer_released = CString::from_raw(ptr_c_string);
                 // Update - end
@@ -167,14 +167,14 @@ pub mod ssvm_storage {
             // Update - end
             unsafe {
                 // Update - start (key as string)
-                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                wasmedge_native::wasmedge_storage_beginLoadTx(ptr_c_string);
                 // Update - end
-                let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
+                let number_of_i32s: i32 = wasmedge_native::wasmedge_storage_loadI32();
                 for _i in 0..number_of_i32s {
-                    i16_vec.push(ssvm_native::ssvm_storage_loadI32());
+                    i16_vec.push(wasmedge_native::wasmedge_storage_loadI32());
                 }
                 let i16_value: i16 = deserialize_vec_i32_to_i16(i16_vec);
-                ssvm_native::ssvm_storage_endLoadTx();
+                wasmedge_native::wasmedge_storage_endLoadTx();
                 // Update - start (key as string)
                 let var_pointer_released = CString::from_raw(ptr_c_string);
                 // Update - end
@@ -194,14 +194,14 @@ pub mod ssvm_storage {
             // Update - end
             unsafe {
                 // Update - start (key as string)
-                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                wasmedge_native::wasmedge_storage_beginLoadTx(ptr_c_string);
                 // Update - end
-                let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
+                let number_of_i32s: i32 = wasmedge_native::wasmedge_storage_loadI32();
                 for _i in 0..number_of_i32s {
-                    i32_vec.push(ssvm_native::ssvm_storage_loadI32());
+                    i32_vec.push(wasmedge_native::wasmedge_storage_loadI32());
                 }
                 let i32_value: i32 = deserialize_vec_i32_to_i32(i32_vec);
-                ssvm_native::ssvm_storage_endLoadTx();
+                wasmedge_native::wasmedge_storage_endLoadTx();
                 // Update - start (key as string)
                 let var_pointer_released = CString::from_raw(ptr_c_string);
                 // Update - end
@@ -221,14 +221,14 @@ pub mod ssvm_storage {
             // Update - end
             unsafe {
                 // Update - start (key as string)
-                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                wasmedge_native::wasmedge_storage_beginLoadTx(ptr_c_string);
                 // Update - end
-                let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
+                let number_of_i32s: i32 = wasmedge_native::wasmedge_storage_loadI32();
                 for _i in 0..number_of_i32s {
-                    i64_vec.push(ssvm_native::ssvm_storage_loadI32());
+                    i64_vec.push(wasmedge_native::wasmedge_storage_loadI32());
                 }
                 let i64_value: i64 = deserialize_vec_i32_to_i64(i64_vec);
-                ssvm_native::ssvm_storage_endLoadTx();
+                wasmedge_native::wasmedge_storage_endLoadTx();
                 // Update - start (key as string)
                 let var_pointer_released = CString::from_raw(ptr_c_string);
                 // Update - end
@@ -248,14 +248,14 @@ pub mod ssvm_storage {
             // Update - end
             unsafe {
                 // Update - start (key as string)
-                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                wasmedge_native::wasmedge_storage_beginLoadTx(ptr_c_string);
                 // Update - end
-                let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
+                let number_of_i32s: i32 = wasmedge_native::wasmedge_storage_loadI32();
                 for _i in 0..number_of_i32s {
-                    u8_vec.push(ssvm_native::ssvm_storage_loadI32());
+                    u8_vec.push(wasmedge_native::wasmedge_storage_loadI32());
                 }
                 let u8_value: u8 = deserialize_vec_i32_to_u8(u8_vec);
-                ssvm_native::ssvm_storage_endLoadTx();
+                wasmedge_native::wasmedge_storage_endLoadTx();
                 // Update - start (key as string)
                 let var_pointer_released = CString::from_raw(ptr_c_string);
                 // Update - end
@@ -275,18 +275,18 @@ pub mod ssvm_storage {
             // Update - end
             unsafe {
                 // Update - start (key as string)
-                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                wasmedge_native::wasmedge_storage_beginLoadTx(ptr_c_string);
                 // Update - end
-                let number_of_i32s: i32 = ssvm_native::ssvm_storage_loadI32();
+                let number_of_i32s: i32 = wasmedge_native::wasmedge_storage_loadI32();
                 // Get all i32s and save them to a vector
                 for _i in 0..number_of_i32s {
-                    retrieved_vec.push(ssvm_native::ssvm_storage_loadI32());
+                    retrieved_vec.push(wasmedge_native::wasmedge_storage_loadI32());
                 }
                 println!{"Deserialize i32 Vec: {:?}", retrieved_vec};
                 // Convert that i32 vector, back into the original u8 vector
                 let the_string = deserialize_vec_i32_to_string(retrieved_vec);
                 // End load
-                ssvm_native::ssvm_storage_endLoadTx();
+                wasmedge_native::wasmedge_storage_endLoadTx();
                 // Update - start (key as string)
                 let var_pointer_released = CString::from_raw(ptr_c_string);
                 // Update - end
@@ -301,14 +301,14 @@ pub mod ssvm_storage {
             unsafe {
                 let mut i32_vector = Vec::new();
                 // Update - start (key as string)
-                ssvm_native::ssvm_storage_beginLoadTx(ptr_c_string);
+                wasmedge_native::wasmedge_storage_beginLoadTx(ptr_c_string);
                 // Update - end
-                let number_of_items: i32 = ssvm_native::ssvm_storage_loadI32();
+                let number_of_items: i32 = wasmedge_native::wasmedge_storage_loadI32();
                 for _i in 0..number_of_items {
-                    let single_i32: i32 = ssvm_native::ssvm_storage_loadI32();
+                    let single_i32: i32 = wasmedge_native::wasmedge_storage_loadI32();
                     i32_vector.push(single_i32);
                 }
-                ssvm_native::ssvm_storage_endLoadTx();
+                wasmedge_native::wasmedge_storage_endLoadTx();
                 // Update - start (key as string)
                 let var_pointer_released = CString::from_raw(ptr_c_string);
                 // Update - end
@@ -318,7 +318,7 @@ pub mod ssvm_storage {
     }
 
     pub mod store {
-        use super::ssvm_native;
+        use super::wasmedge_native;
         use bincode;
         use serialize_deserialize_u8_i32::s_d_u8_i32;
         use std::any::type_name;
@@ -342,7 +342,7 @@ pub mod ssvm_storage {
         /// # Store String
         /// ```rust, ignore
         /// let my_string = String::from("A string to store");
-        /// let storage_key: i32 = ssvm_storage::store::store(my_string);
+        /// let storage_key: i32 = wasmedge_storage::store::store(my_string);
         /// ```
 
         /// # Store Struct
@@ -365,36 +365,36 @@ pub mod ssvm_storage {
             let var_c_string = CString::new("placeholder-32bytes-aaaaaaaaaaaa").expect("Error: The CString::new constructor has failed");
             // Convert the key to a pointer which can be modified by external C++ code (requires into_raw() as apposed to as_ptr())
             let ptr_c_string = var_c_string.into_raw();
-            // Call the createUUID extern C function which allows SSVM to modify the CString's (pointer's) contents
-            unsafe { ssvm_native::ssvm_storage_createUUID(ptr_c_string) }
+            // Call the createUUID extern C function which allows WasmEdge to modify the CString's (pointer's) contents
+            unsafe { wasmedge_native::wasmedge_storage_createUUID(ptr_c_string) }
             // Take ownership of the CString pointer back
             let var_c_string_2: CString= unsafe { CString::from_raw(ptr_c_string) };
             // Create another pointer variable to CString
             let ptr_c_string_2 = var_c_string_2.into_raw();
             // Call the beginStoreTx function using the newest pointer
             unsafe {
-                ssvm_native::ssvm_storage_beginStoreTx(ptr_c_string_2);
+                wasmedge_native::wasmedge_storage_beginStoreTx(ptr_c_string_2);
             }
             let var_c_string_3: CString = unsafe { CString::from_raw(ptr_c_string_2) };
             // Add data length
             unsafe {
-                ssvm_native::ssvm_storage_storeI32(encoded_as_i32.len().try_into().unwrap());
+                wasmedge_native::wasmedge_storage_storeI32(encoded_as_i32.len().try_into().unwrap());
             }
             // Add the data
             unsafe {
                 for i in encoded_as_i32.iter() {
-                    ssvm_native::ssvm_storage_storeI32(*i);
+                    wasmedge_native::wasmedge_storage_storeI32(*i);
                 }
             }
             // End the store
             unsafe {
-                ssvm_native::ssvm_storage_endStoreTx();
+                wasmedge_native::wasmedge_storage_endStoreTx();
             }
             var_c_string_3.to_str().unwrap().to_string()
         }
 
        /// This function does not use serde or bincode it just takes Vec<i32> and stores it natively
-        /// This is for developers who want to unpack their data ahead of time and make it directly available to the SSVM without conversion/serialization overheads at execution time
+        /// This is for developers who want to unpack their data ahead of time and make it directly available to the WasmEdge without conversion/serialization overheads at execution time
         pub fn store_as_i32_vector(i32_vector: Vec<i32>) -> String {
             // Create key as CString data type
             // Create key as CString data type
@@ -402,31 +402,31 @@ pub mod ssvm_storage {
                 .expect("Error: The CString::new constructor has failed");
             // Convert the key to a pointer which can be modified by external C++ code (requires into_raw() as apposed to as_ptr())
             let ptr_c_string = var_c_string.into_raw();
-            // Call the createUUID extern C function which allows SSVM to modify the CString's (pointer's) contents
-            unsafe { ssvm_native::ssvm_storage_createUUID(ptr_c_string) }
+            // Call the createUUID extern C function which allows WasmEdge to modify the CString's (pointer's) contents
+            unsafe { wasmedge_native::wasmedge_storage_createUUID(ptr_c_string) }
             // Take ownership of the CString pointer back
             let var_c_string_2: CString = unsafe { CString::from_raw(ptr_c_string) };
             // Create another pointer variable to CString
             let ptr_c_string_2 = var_c_string_2.into_raw();
             // Call the beginStoreTx function using the newest pointer
             unsafe {
-                ssvm_native::ssvm_storage_beginStoreTx(ptr_c_string_2);
+                wasmedge_native::wasmedge_storage_beginStoreTx(ptr_c_string_2);
             }
             // Retakes ownership of the newest pointer
             let var_c_string_3: CString = unsafe { CString::from_raw(ptr_c_string_2) };
             // store
             unsafe {
-                ssvm_native::ssvm_storage_storeI32(i32_vector.len().try_into().unwrap());
+                wasmedge_native::wasmedge_storage_storeI32(i32_vector.len().try_into().unwrap());
             }
             // Add the data
             unsafe {
                 for i in i32_vector.iter() {
-                    ssvm_native::ssvm_storage_storeI32(*i);
+                    wasmedge_native::wasmedge_storage_storeI32(*i);
                 }
             }
             // End the store
             unsafe {
-                ssvm_native::ssvm_storage_endStoreTx();
+                wasmedge_native::wasmedge_storage_endStoreTx();
             }
             var_c_string_3.to_str().unwrap().to_string()
         }
@@ -440,27 +440,27 @@ pub mod ssvm_storage {
             let encoded_as_i32: Vec<i32> = serialize_unknown_to_vec_i32(&v);
             // Just go ahead and use the existing pointer, no need to create uuid here because we already have it pased in
             unsafe {
-                ssvm_native::ssvm_storage_beginStoreTx(ptr_c_string);
+                wasmedge_native::wasmedge_storage_beginStoreTx(ptr_c_string);
             }
             let var_c_string_2: CString = unsafe { CString::from_raw(ptr_c_string) };
             // Add data length
             unsafe {
-                ssvm_native::ssvm_storage_storeI32(encoded_as_i32.len().try_into().unwrap());
+                wasmedge_native::wasmedge_storage_storeI32(encoded_as_i32.len().try_into().unwrap());
             }
             // Add the data
             unsafe {
                 for i in encoded_as_i32.iter() {
-                    ssvm_native::ssvm_storage_storeI32(*i);
+                    wasmedge_native::wasmedge_storage_storeI32(*i);
                 }
             }
             // End the store
             unsafe {
-                ssvm_native::ssvm_storage_endStoreTx();
+                wasmedge_native::wasmedge_storage_endStoreTx();
             }
         }
 
         /// This function does not use serde or bincode it just takes Vec<i32> and stores it natively
-        /// This is for developers who want to unpack their data ahead of time and make it directly available to the SSVM without conversion/serialization overheads at execution time
+        /// This is for developers who want to unpack their data ahead of time and make it directly available to the WasmEdge without conversion/serialization overheads at execution time
         pub fn update_as_i32_vector(_string_key: &str, i32_vector: Vec<i32>){
             // Create CString out of the string key 
             let var_c_string = CString::new(_string_key).expect("CString::new failed");
@@ -468,22 +468,22 @@ pub mod ssvm_storage {
             let ptr_c_string = var_c_string.into_raw();
             // Just go ahead and use the existing pointer, no need to create uuid here because we already have it pased in
             unsafe {
-                ssvm_native::ssvm_storage_beginStoreTx(ptr_c_string);
+                wasmedge_native::wasmedge_storage_beginStoreTx(ptr_c_string);
             }
             let var_c_string_2: CString = unsafe { CString::from_raw(ptr_c_string) };
             // store
             unsafe {
-                ssvm_native::ssvm_storage_storeI32(i32_vector.len().try_into().unwrap());
+                wasmedge_native::wasmedge_storage_storeI32(i32_vector.len().try_into().unwrap());
             }
             // Add the data
             unsafe {
                 for i in i32_vector.iter() {
-                    ssvm_native::ssvm_storage_storeI32(*i);
+                    wasmedge_native::wasmedge_storage_storeI32(*i);
                 }
             }
             // End the store
             unsafe {
-                ssvm_native::ssvm_storage_endStoreTx();
+                wasmedge_native::wasmedge_storage_endStoreTx();
             }
         }
     }
@@ -495,7 +495,7 @@ pub mod ssvm_storage {
 //
 #[cfg(test)]
 mod tests {
-    use super::ssvm_storage;
+    use super::wasmedge_storage;
     use serde::{Deserialize, Serialize};
     // It is a requirement that the user calling the store and load implements the serde Default etc. as shown below.
     #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
@@ -514,10 +514,10 @@ mod tests {
             a_bool: true,
         };
         let _encoded_as_i32: Vec<i32> =
-            ssvm_storage::store::serialize_unknown_to_vec_i32(&test_struct1);
+            wasmedge_storage::store::serialize_unknown_to_vec_i32(&test_struct1);
         println!("Encoded as Vec<i32>: {:?}", test_struct1);
         assert_eq!(
-            ssvm_storage::store::type_of(test_struct1),
+            wasmedge_storage::store::type_of(test_struct1),
             "rust_storage_interface_library::tests::TestStruct"
         );
     }
@@ -530,11 +530,11 @@ mod tests {
             a_bool: true,
         };
         let encoded_as_i32: Vec<i32> =
-            ssvm_storage::store::serialize_unknown_to_vec_i32(&test_struct1);
+            wasmedge_storage::store::serialize_unknown_to_vec_i32(&test_struct1);
         println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
         let test_struct2 = TestStruct::default();
         let test_struct3 =
-            ssvm_storage::load::deserialize_vec_i32_to_unknown(encoded_as_i32, test_struct2);
+            wasmedge_storage::load::deserialize_vec_i32_to_unknown(encoded_as_i32, test_struct2);
         println!("Decoded as unknown: {:?}", test_struct3);
         assert_eq!(test_struct3.a_vec[0], 134);
         assert_eq!(test_struct3.a_i32, 4);
@@ -544,19 +544,19 @@ mod tests {
     #[test]
     fn test_store_as_bool() {
         let boolean1: bool = true;
-        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&boolean1);
+        let encoded_as_i32: Vec<i32> = wasmedge_storage::store::serialize_unknown_to_vec_i32(&boolean1);
         println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
         assert_eq!(boolean1, true);
-        assert_eq!(ssvm_storage::store::type_of(boolean1), "bool");
+        assert_eq!(wasmedge_storage::store::type_of(boolean1), "bool");
         assert_eq!(encoded_as_i32.len(), 1);
         assert_eq!(encoded_as_i32[0], 1);
     }
     #[test]
     fn test_load_as_boolean() {
         let boolean1: bool = true;
-        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&boolean1);
+        let encoded_as_i32: Vec<i32> = wasmedge_storage::store::serialize_unknown_to_vec_i32(&boolean1);
         println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
-        let boolean2 = ssvm_storage::load::deserialize_vec_i32_to_bool(encoded_as_i32);
+        let boolean2 = wasmedge_storage::load::deserialize_vec_i32_to_bool(encoded_as_i32);
         println!("Decoded as boolean: {:?}", boolean2);
         assert_eq!(boolean2, true);
     }
@@ -564,10 +564,10 @@ mod tests {
     fn test_store_as_char() {
         let character1: char = 'a';
         let encoded_as_i32: Vec<i32> =
-            ssvm_storage::store::serialize_unknown_to_vec_i32(&character1);
+            wasmedge_storage::store::serialize_unknown_to_vec_i32(&character1);
         println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
         assert_eq!(character1, 'a');
-        assert_eq!(ssvm_storage::store::type_of(character1), "char");
+        assert_eq!(wasmedge_storage::store::type_of(character1), "char");
         assert_eq!(encoded_as_i32.len(), 1);
         assert_eq!(encoded_as_i32[0], 97);
     }
@@ -575,57 +575,57 @@ mod tests {
     fn test_load_as_character() {
         let character1: char = 'a';
         let encoded_as_i32: Vec<i32> =
-            ssvm_storage::store::serialize_unknown_to_vec_i32(&character1);
+            wasmedge_storage::store::serialize_unknown_to_vec_i32(&character1);
         println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
-        let character2 = ssvm_storage::load::deserialize_vec_i32_to_char(encoded_as_i32);
+        let character2 = wasmedge_storage::load::deserialize_vec_i32_to_char(encoded_as_i32);
         println!("Decoded as character: {:?}", character2);
         assert_eq!(character2, 'a');
     }
     #[test]
     fn test_store_as_i8() {
         let i81: i8 = -2;
-        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&i81);
+        let encoded_as_i32: Vec<i32> = wasmedge_storage::store::serialize_unknown_to_vec_i32(&i81);
         println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
         assert_eq!(i81, -2);
-        assert_eq!(ssvm_storage::store::type_of(i81), "i8");
+        assert_eq!(wasmedge_storage::store::type_of(i81), "i8");
         assert_eq!(encoded_as_i32.len(), 1);
         assert_eq!(encoded_as_i32[0], 254);
     }
     #[test]
     fn test_load_as_i8() {
         let i81: i8 = -2;
-        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&i81);
+        let encoded_as_i32: Vec<i32> = wasmedge_storage::store::serialize_unknown_to_vec_i32(&i81);
         println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
-        let i82 = ssvm_storage::load::deserialize_vec_i32_to_i8(encoded_as_i32);
+        let i82 = wasmedge_storage::load::deserialize_vec_i32_to_i8(encoded_as_i32);
         println!("Decoded as i8: {:?}", i82);
         assert_eq!(i82, -2);
     }
     #[test]
     fn test_store_as_i16() {
         let i161: i16 = -2;
-        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&i161);
+        let encoded_as_i32: Vec<i32> = wasmedge_storage::store::serialize_unknown_to_vec_i32(&i161);
         println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
         assert_eq!(i161, -2);
-        assert_eq!(ssvm_storage::store::type_of(i161), "i16");
+        assert_eq!(wasmedge_storage::store::type_of(i161), "i16");
         assert_eq!(encoded_as_i32.len(), 1);
         assert_eq!(encoded_as_i32[0], 2000254255);
     }
     #[test]
     fn test_load_as_i16() {
         let i161: i16 = -2;
-        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&i161);
+        let encoded_as_i32: Vec<i32> = wasmedge_storage::store::serialize_unknown_to_vec_i32(&i161);
         println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
-        let i162 = ssvm_storage::load::deserialize_vec_i32_to_i16(encoded_as_i32);
+        let i162 = wasmedge_storage::load::deserialize_vec_i32_to_i16(encoded_as_i32);
         println!("Decoded as i16: {:?}", i162);
         assert_eq!(i162, -2);
     }
     #[test]
     fn test_store_as_i32() {
         let i321: i32 = 1234567890;
-        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&i321);
+        let encoded_as_i32: Vec<i32> = wasmedge_storage::store::serialize_unknown_to_vec_i32(&i321);
         println!("Encoded as Vec<i32>: {:?}", encoded_as_i32);
         assert_eq!(i321, 1234567890);
-        assert_eq!(ssvm_storage::store::type_of(i321), "i32");
+        assert_eq!(wasmedge_storage::store::type_of(i321), "i32");
         assert_eq!(encoded_as_i32.len(), 2);
         assert_eq!(encoded_as_i32[0], 1210002150);
         assert_eq!(encoded_as_i32[1], 73);
@@ -633,19 +633,19 @@ mod tests {
     #[test]
     fn test_load_as_i32() {
         let i321: i32 = 1234567890;
-        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&i321);
+        let encoded_as_i32: Vec<i32> = wasmedge_storage::store::serialize_unknown_to_vec_i32(&i321);
         println!("I32 - Encoded as Vec<i32>: {:?}", encoded_as_i32);
-        let i322 = ssvm_storage::load::deserialize_vec_i32_to_i32(encoded_as_i32);
+        let i322 = wasmedge_storage::load::deserialize_vec_i32_to_i32(encoded_as_i32);
         println!("Decoded as i32: {:?}", i322);
         assert_eq!(i322, 1234567890);
     }
     #[test]
     fn test_store_as_i64() {
         let i641: i64 = 9223372036854775807;
-        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&i641);
+        let encoded_as_i32: Vec<i32> = wasmedge_storage::store::serialize_unknown_to_vec_i32(&i641);
         println!("I64 - Encoded as Vec<i32>: {:?}", encoded_as_i32);
         assert_eq!(i641, 9223372036854775807);
-        assert_eq!(ssvm_storage::store::type_of(i641), "i64");
+        assert_eq!(wasmedge_storage::store::type_of(i641), "i64");
         assert_eq!(encoded_as_i32.len(), 3);
         assert_eq!(encoded_as_i32[0], 1255255255);
         assert_eq!(encoded_as_i32[1], 1255255255);
@@ -654,28 +654,28 @@ mod tests {
     #[test]
     fn test_load_as_i64() {
         let i641: i64 = 9223372036854775807;
-        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&i641);
+        let encoded_as_i32: Vec<i32> = wasmedge_storage::store::serialize_unknown_to_vec_i32(&i641);
         println!("I64 - Encoded as Vec<i32>: {:?}", encoded_as_i32);
-        let i642 = ssvm_storage::load::deserialize_vec_i32_to_i64(encoded_as_i32);
+        let i642 = wasmedge_storage::load::deserialize_vec_i32_to_i64(encoded_as_i32);
         println!("Decoded as i64: {:?}", i642);
         assert_eq!(i642, 9223372036854775807);
     }
     #[test]
     fn test_store_as_u8() {
         let u81: u8 = 100;
-        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&u81);
+        let encoded_as_i32: Vec<i32> = wasmedge_storage::store::serialize_unknown_to_vec_i32(&u81);
         println!("I64 - Encoded as Vec<i32>: {:?}", encoded_as_i32);
         assert_eq!(u81, 100);
-        assert_eq!(ssvm_storage::store::type_of(u81), "u8");
+        assert_eq!(wasmedge_storage::store::type_of(u81), "u8");
         assert_eq!(encoded_as_i32.len(), 1);
         assert_eq!(encoded_as_i32[0], 100);
     }
     #[test]
     fn test_load_as_u8() {
         let u81: u8 = 100;
-        let encoded_as_i32: Vec<i32> = ssvm_storage::store::serialize_unknown_to_vec_i32(&u81);
+        let encoded_as_i32: Vec<i32> = wasmedge_storage::store::serialize_unknown_to_vec_i32(&u81);
         println!("I64 - Encoded as Vec<i32>: {:?}", encoded_as_i32);
-        let u82 = ssvm_storage::load::deserialize_vec_i32_to_u8(encoded_as_i32);
+        let u82 = wasmedge_storage::load::deserialize_vec_i32_to_u8(encoded_as_i32);
         println!("Decoded as u8: {:?}", u82);
         assert_eq!(u82, 100);
     }
